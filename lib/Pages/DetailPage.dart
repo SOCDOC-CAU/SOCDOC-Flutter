@@ -315,12 +315,12 @@ class _DetailPageState extends State<DetailPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(
-        _LifecycleObserver(resumeCallback: () async => reviewInfo())
+        _LifecycleObserver(resumeCallback: () async { reviewInfo(); hospitalDetailInfo();})
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       reviewInfo();
+      hospitalDetailInfo();
     });
-    hospitalDetailInfo();
     pharmacyInfo();
   }
 
