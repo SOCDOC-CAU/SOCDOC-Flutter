@@ -5,20 +5,42 @@ import 'package:socdoc_flutter/Utils/HospitalTypes.dart';
 import '../../Utils/Color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
+  final String address1='';
+  final String address2='';
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+
+  Future<void> MainFamousHospital() async {
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?"
+        "address1=${widget.address1}&address1=${widget.address2}&pageNum=1&sortType=0"))
+        .then((value){
+      setState(() {
+        var tmp = utf8.decode(value.bodyBytes);
+        FamousHospital = jsonDecode(tmp)["data"];
+        print(value.body);
+        print(hospitalDetail);
+        isLoading_hospital = false;
+      });
+    })
+        .onError((error, stackTrace){
+      print(error);
+      print(stackTrace);
+    });
+  }
   List<int> selectedTileIndices = [1,5,8,12];
   @override
   void initState() {
     super.initState();
+    MainFamousHospital();
     WidgetsBinding.instance.addObserver(
       _LifecycleObserver(resumeCallback: () async => loadSelectedIndices())
     );
