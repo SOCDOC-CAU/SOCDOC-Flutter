@@ -6,10 +6,20 @@ import 'package:socdoc_flutter/Pages/MainSubPages/SettingAddressPage.dart';
 import 'dart:convert';
 import "package:http/http.dart" as http;
 
-class SettingPage extends StatelessWidget {
+class SettingPage extends StatefulWidget{
   const SettingPage({Key? key});
 
   @override
+  State<StatefulWidget> createState() => _SettingPageState();
+}
+
+class _SettingPageState extends State<SettingPage> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   Widget build(BuildContext context) {
     SocdocAppState socdocApp = context.findAncestorStateOfType<SocdocAppState>()!;
 
