@@ -1,3 +1,4 @@
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:socdoc_flutter/Utils/AuthUtil.dart';
@@ -25,11 +26,19 @@ class _SettingPageState extends State<SettingPage> {
   bool isLoading_favoriteHospital = true;
   bool isLoading_userReview = true;
 
+  void _updateUserInfo() {
+    userInfo();
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(
-        _LifecycleObserver(resumeCallback: () async { userInfo(); userReviewInfo(); favoriteHospitalInfo();})
+      _LifecycleObserver(resumeCallback: () async {
+        userInfo();
+        userReviewInfo();
+        favoriteHospitalInfo();
+      })
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       userInfo();
@@ -188,7 +197,7 @@ class _SettingPageState extends State<SettingPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SettingAddressPage(),
+                            builder: (context) => SettingAddressPage(onAddressUpdate: _updateUserInfo),
                           ),
                         );
                       },
