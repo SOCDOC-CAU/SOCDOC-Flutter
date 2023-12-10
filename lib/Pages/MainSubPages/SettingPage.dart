@@ -14,10 +14,28 @@ class SettingPage extends StatefulWidget{
 }
 
 class _SettingPageState extends State<SettingPage> {
+  var userDetail = null;
+  bool isLoading_userInfo = true;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> userInfo() async {
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/user?userId=${getUserID()}"))
+        .then((value){
+      setState(() {
+        var tmp = utf8.decode(value.bodyBytes);
+        userDetail = jsonDecode(tmp)["data"];
+        print(value.body);
+        print(userDetail);
+        isLoading_userInfo = false;
+      });
+    }).onError((error, stackTrace){
+      print(error);
+      print(stackTrace);
+    });
   }
 
   Widget build(BuildContext context) {
