@@ -14,15 +14,11 @@ import 'package:socdoc_flutter/Utils/HospitalTypes.dart';
 
 bool isButtonPressed = false;
 bool isHospitalSelected = false;
-final List<String> SortingCriteria = [
-  '별점순',
-  '이름순',
-];
+final List<String> SortingCriteria = ['별점순', '이름순'];
 String? selectedValue1 = "0";
 String selectedHospitalKO = '전체';
 String curAddress1 = "서울시";
 String curAddress2 = "동작구";
-
 
 List<Widget> hospitalItemList = [];
 
@@ -41,7 +37,7 @@ class SearchPage extends StatelessWidget {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailPage(hpid: "A1100005")));
               }
             ),
-            Expanded(
+            const Expanded(
               child: Stack(
                 children:[
                   MapView(),
