@@ -223,13 +223,13 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  Widget HospitalInfo(String name, String address, String img) {
+  Widget HospitalInfo(String name, String address, String img, String hospitalId) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailPage(hpid: "A1100005"),
+            builder: (context) => DetailPage(hpid: hospitalId),
           ),
         );
       },
@@ -284,9 +284,10 @@ class _SettingPageState extends State<SettingPage> {
           var hospital = favoriteHospital[index];
           String hospitalName = hospital["name"];
           String hospitalAddress = hospital["address"];
+          String hospitalId = hospital["hpid"];
           return Padding(
             padding: const EdgeInsets.all(10.0),
-            child: HospitalInfo(hospitalName, hospitalAddress, 'assets/hospital2.png'),
+            child: HospitalInfo(hospitalName, hospitalAddress, 'assets/hospital2.png', hospitalId),
           );
         },
       ),
