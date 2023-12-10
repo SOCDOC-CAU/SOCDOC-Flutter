@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
   Future<void> userLocation() async {
-    http.get(Uri.parse("https://socdoc.dev-lr.com/api/user?userId=${getUserID()}"))
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/user?userId=${getUserID(context)}"))
         .then((value)async {
         var tmp = utf8.decode(value.bodyBytes);
         UserLocationData = jsonDecode(tmp)["data"];
