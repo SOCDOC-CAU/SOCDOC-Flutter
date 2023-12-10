@@ -3,8 +3,10 @@ import 'package:socdoc_flutter/Utils/AuthUtil.dart';
 import 'package:socdoc_flutter/main.dart';
 import 'package:socdoc_flutter/Utils/Color.dart';
 import 'package:socdoc_flutter/Pages/MainSubPages/SettingAddressPage.dart';
+import 'package:socdoc_flutter/Pages/DetailPage.dart';
 import 'dart:convert';
 import "package:http/http.dart" as http;
+
 
 class SettingPage extends StatefulWidget{
   const SettingPage({Key? key});
@@ -222,40 +224,50 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget HospitalInfo(String name, String address, String img) {
-    return Container(
-      width: 200,
-      height: 160,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black26, width: 0.5),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(10.0),
-          topRight: Radius.circular(10.0),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(hpid: "A1100005"),
+          ),
+        );
+      },
+      child: Container(
+        width: 200,
+        height: 160,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black26, width: 0.5),
+          borderRadius: BorderRadius.circular(10.0),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image(image: AssetImage(img), width: 200, height: 100, fit: BoxFit.cover),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, top: 8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue)),
-                  SizedBox(height: 5.0),
-                  Row(
-                    children: [
-                      Icon(Icons.location_on, size: 15),
-                      Expanded(child: Text(address, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black54))),
-                    ],
-                  ),
-                ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10.0),
+            topRight: Radius.circular(10.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image(image: AssetImage(img), width: 200, height: 100, fit: BoxFit.cover),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue)),
+                    SizedBox(height: 5.0),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, size: 15),
+                        Expanded(child: Text(address, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black54))),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
