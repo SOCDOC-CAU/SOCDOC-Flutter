@@ -16,7 +16,9 @@ class SettingPage extends StatefulWidget{
 class _SettingPageState extends State<SettingPage> {
   String userName = "";
   String userAddress = "";
+  var favoriteHospital = null;
   bool isLoading_userInfo = true;
+  bool isLoading_favoriteHospital = true;
 
   @override
   void initState() {
@@ -49,6 +51,23 @@ class _SettingPageState extends State<SettingPage> {
         isLoading_userInfo = false;
       });
     }).onError((error, stackTrace){
+      print(error);
+      print(stackTrace);
+    });
+  }
+
+  Future<void> favoriteHospitalInfo() async {
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/like?userId=${getUserID()}"))
+        .then((value){
+      setState(() {
+        var tmp = utf8.decode(value.bodyBytes);
+        favoriteHospital = jsonDecode(tmp)["data"];
+        print(value.body);
+        print(favoriteHospital);
+        isLoading_favoriteHospital = false;
+      });
+    })
+        .onError((error, stackTrace){
       print(error);
       print(stackTrace);
     });
