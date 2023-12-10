@@ -97,7 +97,6 @@ class _MapViewState extends State<MapView> {
             setState(() {
               curAddress1 = resJson["documents"][0]["region_1depth_name"];
               curAddress2 = resJson["documents"][0]["region_2depth_name"];
-              print("${curAddress1} ${curAddress2}");
             });
           });
       }
