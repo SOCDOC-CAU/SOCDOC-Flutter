@@ -357,15 +357,13 @@ class _DetailPageState extends State<DetailPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          SizedBox(width: 15.0),
-                          Expanded(
-                            child: Text(
-                              hospitalDetail["name"],
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24,
-                              ),
+                          SizedBox(width: 25.0),
+                          Text(
+                            hospitalDetail["name"],
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
                             ),
                           ),
                           Column(
