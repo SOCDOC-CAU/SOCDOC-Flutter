@@ -104,6 +104,18 @@ class _SettingPageState extends State<SettingPage> {
     });
   }
 
+  Future<void> updateUserName(String newUserName) async {
+    http.put(Uri.parse("https://socdoc.dev-lr.com/api/user/update/name"),
+        headers: {
+          "content-type": "application/json"
+        },
+        body: jsonEncode({
+          "userId": getUserID(),
+          "userName" : newUserName,
+        }));
+    print("**********닉네임변경**********");
+  }
+
   Widget build(BuildContext context) {
     SocdocAppState socdocApp = context.findAncestorStateOfType<SocdocAppState>()!;
 
@@ -195,6 +207,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<void> _nickNameDialog(BuildContext context) async {
+    String newUserName = "";
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -205,7 +218,7 @@ class _SettingPageState extends State<SettingPage> {
             padding: EdgeInsets.symmetric(vertical: 10.0),
             child: TextField(
               onChanged: (value) {
-                context = value as BuildContext;
+                newUserName = value;
               },
               decoration: InputDecoration(
                 hintText: '새로운 닉네임 입력',
@@ -226,8 +239,12 @@ class _SettingPageState extends State<SettingPage> {
               child: Text('Cancel', style : TextStyle(fontSize: 17.0, color: AppColor.SocdocBlue)),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                await updateUserName(newUserName);
                 Navigator.of(context).pop();
+                setState(() {
+                  userName = newUserName;
+                });
               },
               child: Text('OK', style : TextStyle(fontSize: 17.0, color: AppColor.SocdocBlue)),
             ),
