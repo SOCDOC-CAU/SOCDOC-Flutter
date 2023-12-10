@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
       print(FamousHospitalData.toString());
       return
         SizedBox(
-          height: 350.0,
+          height: 400.0,
           child: ListView.builder(
 
               itemCount: FamousHospitalData.length,
@@ -264,11 +264,19 @@ class _HomePageState extends State<HomePage> {
   }
   //카드 안에 주소
   Widget HospitalAddress(String text) {
-    return Row(
+    return
+      Row(
       children: [
         Padding(padding: edgeInsets, child: Icon(Icons.location_on)),
-        Padding(padding: EdgeInsets.only(left: 10.0)),
-        Text(text,overflow: TextOverflow.ellipsis, style: detailHospitalStyle),
+        Padding(padding: EdgeInsets.only(left: 10.0, top:10.0)),
+        Container(
+          width: 270.0, // 원하는 가로 길이 설정
+          child: Text(
+            text,
+            overflow: TextOverflow.ellipsis,
+            style: detailHospitalStyle,
+          ),
+        ),
       ],
     );
   }
@@ -308,9 +316,12 @@ class _HomePageState extends State<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(text,
-                          overflow: TextOverflow.ellipsis,
-                          style: titleHospital),
+                      Container(
+                        width: 280.0,
+                        child: Text(text,
+                            overflow: TextOverflow.ellipsis,
+                            style: titleHospital),
+                      ),
                       Column(
                         children: [
                           Padding(
