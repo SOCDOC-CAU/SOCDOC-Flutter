@@ -198,7 +198,9 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                             ],
                           ),
                           const SizedBox(height: 15),
-                          Column(children: hospitalItemList),
+                          hospitalItemList.isNotEmpty
+                              ? Column(children: hospitalItemList)
+                              : SizedBox(height: double.infinity, child: circularProgress())
                         ],
                       ),
                     ),
@@ -220,7 +222,6 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
           "&pageNum=$pageIdx&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
           .then((value){
         var tmp = jsonDecode(utf8.decode(value.bodyBytes));
-        print("AAAAAAAA ${value.request}");
         setState(() {
           tmp["data"].forEach((item){
             hospitalItemList.add(HospitalCard(item["name"]));
@@ -371,6 +372,20 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
           height: 40,
           padding: EdgeInsets.only(left: 14, right: 14),
         ),
+      ),
+    );
+  }
+
+  Widget circularProgress(){
+    return Center(
+      child: Container(
+          alignment: Alignment.center,
+          color: Colors.white,
+          child: const SizedBox(
+              width: 50,
+              height: 50,
+              child: CircularProgressIndicator()
+          )
       ),
     );
   }
