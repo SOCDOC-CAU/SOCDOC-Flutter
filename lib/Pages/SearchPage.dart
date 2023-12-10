@@ -203,7 +203,23 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                               : Column(mainAxisSize: MainAxisSize.max, children: [circularProgress()],),
                           const SizedBox(height: 15),
                           ElevatedButton(
-                            onPressed: (){},
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(108, 45),
+                              backgroundColor: AppColor.logo,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                side: const BorderSide(
+                                  color: AppColor.logo,
+                                  width: 1.0,
+                                ),
+                              ),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                            ),
+                            onPressed: (){
+                              pageIdx++;
+                              getHospitalList();
+                            },
                             child: const Text("더보기"))
                         ],
                       ),
