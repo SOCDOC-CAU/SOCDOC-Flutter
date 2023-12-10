@@ -149,8 +149,15 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   @override
   void initState() {
     super.initState();
-    isButtonPressed = true;
+
+    isButtonPressed = false;
+    isHospitalSelected = false;
+    pageIdx = 1;
     selectedValue1 = SortingCriteria[0];
+    selectedHospitalID = "D000";
+    selectedHospitalKO = '전체';
+    curAddress1 = "서울특별시";
+    curAddress2 = "동작구";
 
     getHospitalList();
   }
@@ -331,6 +338,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
         value: selectedValue1,
         onChanged: (value) {
           setState(() {
+            pageIdx = 1;
             selectedValue1 = value;
             getHospitalList();
           });
@@ -446,6 +454,7 @@ class CustomDropDownState extends State<CustomDropDown> {
                 width: _buttonWidth,
                 onItemSelected: (selectedItem) {
                   setState(() {
+                    pageIdx = 1;
                     selectedHospitalKO = selectedItem;
                     _tooltipController.toggle();
                     isButtonPressed = true;
@@ -513,7 +522,6 @@ class MenuWidget extends StatefulWidget {
 }
 
 class _MenuWidgetState extends State<MenuWidget> {
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
