@@ -80,68 +80,68 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget UserInfo(String name, String address, BuildContext context) {
     if(isLoading_userInfo) return circularProgress();
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Container(
-              width: 75,
-              height: 75,
-              child: ClipOval(
-                child: Image(
-                  image: AssetImage('assets/user.png'),
-                  fit: BoxFit.cover,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Container(
+            width: 75,
+            height: 75,
+            child: ClipOval(
+              child: Image(
+                image: AssetImage('assets/user.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          SizedBox(width: 25.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(name, style: TextStyle(
+                        fontSize: 30.0, fontWeight: FontWeight.bold)),
+                    IconButton(
+                      onPressed: () {
+                        _nickNameDialog(context);
+                      },
+                      icon: Icon(Icons.arrow_forward_ios_rounded,
+                          color: Colors.black, size: 20.0),
+                    ),
+                  ],
                 ),
-              ),
+                SizedBox(height: 3.0),
+                Row(
+                  children: [
+                    Icon(Icons.home_work_outlined, color: Colors.grey,
+                        size: 18.0),
+                    SizedBox(width: 5.0),
+                    Text(address,
+                        style: TextStyle(fontSize: 15.0, color: Colors.grey)),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingAddressPage(),
+                          ),
+                        );
+                      },
+                      icon: Icon(
+                          Icons.arrow_forward_ios_rounded, color: Colors.grey,
+                          size: 15.0),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            SizedBox(width: 25.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(name, style: TextStyle(
-                          fontSize: 30.0, fontWeight: FontWeight.bold)),
-                      IconButton(
-                        onPressed: () {
-                          _nickNameDialog(context);
-                        },
-                        icon: Icon(Icons.arrow_forward_ios_rounded,
-                            color: Colors.black, size: 20.0),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 3.0),
-                  Row(
-                    children: [
-                      Icon(Icons.home_work_outlined, color: Colors.grey,
-                          size: 18.0),
-                      SizedBox(width: 5.0),
-                      Text(address,
-                          style: TextStyle(fontSize: 15.0, color: Colors.grey)),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SettingAddressPage(),
-                            ),
-                          );
-                        },
-                        icon: Icon(
-                            Icons.arrow_forward_ios_rounded, color: Colors.grey,
-                            size: 15.0),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _nickNameDialog(BuildContext context) async {
