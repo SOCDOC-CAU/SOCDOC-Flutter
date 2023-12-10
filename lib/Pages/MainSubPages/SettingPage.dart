@@ -28,13 +28,13 @@ class _SettingPageState extends State<SettingPage> {
   @override
   void initState() {
     super.initState();
-    favoriteHospitalInfo();
-    userReviewInfo();
     WidgetsBinding.instance.addObserver(
-        _LifecycleObserver(resumeCallback: () async => userInfo())
+        _LifecycleObserver(resumeCallback: () async { userInfo(); userReviewInfo(); favoriteHospitalInfo();})
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       userInfo();
+      userReviewInfo();
+      favoriteHospitalInfo();
     });
   }
 
@@ -325,7 +325,6 @@ class _SettingPageState extends State<SettingPage> {
     if(isLoading_userReview) return circularProgress();
     return Container(
       padding: const EdgeInsets.all(8.0),
-      height: 150,
       child: ListView.builder(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
