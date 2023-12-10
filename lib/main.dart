@@ -4,13 +4,13 @@ import 'package:provider/provider.dart';
 
 import 'package:socdoc_flutter/Pages/LoginPage.dart';
 import 'package:socdoc_flutter/Pages/MainPage.dart';
-import 'package:socdoc_flutter/Utils/AuthProvider.dart';
+import 'package:socdoc_flutter/Utils/SocdocAuthProvider.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
   runApp(
     ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
+      create: (context) => SocdocAuthProvider(),
       child: const SocdocApp()
     )
   );

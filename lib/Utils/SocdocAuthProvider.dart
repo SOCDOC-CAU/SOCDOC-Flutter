@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-class AuthProvider extends ChangeNotifier {
+class SocdocAuthProvider extends ChangeNotifier {
   String userID = "";
   String userToken = "";
 
   void updateUser(String id, String token) {
     userID = id;
     userToken = token;
+    notifyListeners();
   }
 }

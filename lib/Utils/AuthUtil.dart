@@ -1,13 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:socdoc_flutter/Utils/SocdocAuthProvider.dart';
 
-String getUserID(context) {
-  return context.watch<AuthProvider>().userID;
+String getUserID(BuildContext context) {
+  return context.watch<SocdocAuthProvider>().userID;
 }
 
-Future<String?> getUserToken(context) async {
-  return context.watch<AuthProvider>().userToken;
+Future<String?> getUserToken(BuildContext context) async {
+  return context.watch<SocdocAuthProvider>().userToken;
 }
 
 Future<String?> tryAppleLogin() async {
