@@ -3,6 +3,8 @@ import 'package:socdoc_flutter/Utils/AuthUtil.dart';
 import 'package:socdoc_flutter/main.dart';
 import 'package:socdoc_flutter/Utils/Color.dart';
 import 'package:socdoc_flutter/Pages/MainSubPages/SettingAddressPage.dart';
+import 'dart:convert';
+import "package:http/http.dart" as http;
 
 class SettingPage extends StatelessWidget {
   const SettingPage({Key? key});
