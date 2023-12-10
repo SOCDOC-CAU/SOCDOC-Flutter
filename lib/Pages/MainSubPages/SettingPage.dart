@@ -249,7 +249,7 @@ class _SettingPageState extends State<SettingPage> {
                   Row(
                     children: [
                       Icon(Icons.location_on, size: 15),
-                      Text(address, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black54)),
+                      Expanded(child: Text(address, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black54))),
                     ],
                   ),
                 ],
@@ -273,7 +273,7 @@ class _SettingPageState extends State<SettingPage> {
           String hospitalName = hospital["name"];
           String hospitalAddress = hospital["address"];
           return Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(10.0),
             child: HospitalInfo(hospitalName, hospitalAddress, 'assets/hospital2.png'),
           );
         },
