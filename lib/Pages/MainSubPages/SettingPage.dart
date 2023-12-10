@@ -14,12 +14,28 @@ class SettingPage extends StatefulWidget{
 }
 
 class _SettingPageState extends State<SettingPage> {
-  var userDetail = null;
+  String userName = "";
+  String userAddress = "";
   bool isLoading_userInfo = true;
 
   @override
   void initState() {
     super.initState();
+    userInfo();
+  }
+
+  Widget circularProgress(){
+    return Center(
+      child: Container(
+          alignment: Alignment.center,
+          color: Colors.white,
+          child: Container(
+              width: 100,
+              height: 100,
+              child: CircularProgressIndicator()
+          )
+      ),
+    );
   }
 
   Future<void> userInfo() async {
@@ -27,9 +43,9 @@ class _SettingPageState extends State<SettingPage> {
         .then((value){
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
-        userDetail = jsonDecode(tmp)["data"];
+        userName = jsonDecode(tmp)["data"]["userName"];
+        userAddress = jsonDecode(tmp)["data"]["address1"] + ' '+ jsonDecode(tmp)["data"]["address2"];
         print(value.body);
-        print(userDetail);
         isLoading_userInfo = false;
       });
     }).onError((error, stackTrace){
@@ -47,7 +63,7 @@ class _SettingPageState extends State<SettingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            UserInfo("Dev.LR", "서울특별시 동작구", context),
+            UserInfo(userName, userAddress, context),
             SizedBox(height: 20.0),
             MyPageList("즐겨찾기 병원 목록", Icons.favorite_border),
             FavoriteHospital(),
@@ -63,62 +79,69 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget UserInfo(String name, String address, BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Container(
-            width: 75,
-            height: 75,
-            child: ClipOval(
-              child: Image(
-                image: AssetImage('assets/user.png'),
-                fit: BoxFit.cover,
+    if(isLoading_userInfo) return circularProgress();
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Container(
+              width: 75,
+              height: 75,
+              child: ClipOval(
+                child: Image(
+                  image: AssetImage('assets/user.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          SizedBox(width: 25.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(name, style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold)),
-                    IconButton(
-                      onPressed: () {
-                        _nickNameDialog(context);
-                      },
-                      icon: Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 20.0),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 3.0),
-                Row(
-                  children: [
-                    Icon(Icons.home_work_outlined, color: Colors.grey, size: 18.0),
-                    SizedBox(width: 5.0),
-                    Text(address, style: TextStyle(fontSize: 15.0, color: Colors.grey)),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettingAddressPage(),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 15.0),
-                    ),
-                  ],
-                ),
-              ],
+            SizedBox(width: 25.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(name, style: TextStyle(
+                          fontSize: 30.0, fontWeight: FontWeight.bold)),
+                      IconButton(
+                        onPressed: () {
+                          _nickNameDialog(context);
+                        },
+                        icon: Icon(Icons.arrow_forward_ios_rounded,
+                            color: Colors.black, size: 20.0),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 3.0),
+                  Row(
+                    children: [
+                      Icon(Icons.home_work_outlined, color: Colors.grey,
+                          size: 18.0),
+                      SizedBox(width: 5.0),
+                      Text(address,
+                          style: TextStyle(fontSize: 15.0, color: Colors.grey)),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SettingAddressPage(),
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                            Icons.arrow_forward_ios_rounded, color: Colors.grey,
+                            size: 15.0),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
   }
 
   Future<void> _nickNameDialog(BuildContext context) async {
