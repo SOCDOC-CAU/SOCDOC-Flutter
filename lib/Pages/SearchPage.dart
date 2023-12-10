@@ -11,7 +11,12 @@ import 'package:socdoc_flutter/Utils/HospitalTypes.dart';
 
 bool isButtonPressed = false;
 bool isHospitalSelected = false;
-
+final List<String> SortingCriteria = [
+  '별점순',
+  '이름순',
+];
+String? selectedValue1;
+String selectedHospitalKO = '';
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
@@ -109,9 +114,6 @@ class _MapViewState extends State<MapView> {
 }
 
 
-class SharedData {
-  static String selectedHospitalKO = '';
-}
 class MapBottomSheet extends StatefulWidget {
   const MapBottomSheet({super.key});
 
@@ -120,17 +122,13 @@ class MapBottomSheet extends StatefulWidget {
 }
 class _MapBottomSheetState extends State<MapBottomSheet> {
 
-  final List<String> SortingCriteria = [
-    '별점순',
-    '이름순',
-  ];
-  String? selectedValue1;
+
   IconData arrowIcon = Icons.expand_more;
   bool isDropdownOpened = false;
   bool isSelected =  false;
   String? selectedHospitalName; //여기다가 병원 진료과목 저장해두었습니다
   bool isHospitalSpecialtyPressed = false;
-  String selectedHospitalKO = SharedData.selectedHospitalKO;
+
   @override
   void initState() {
     super.initState();
@@ -386,7 +384,7 @@ class CustomDropDownState extends State<CustomDropDown> {
   final _link = LayerLink();
   double? _buttonWidth;
   final OverlayPortalController _tooltipController = OverlayPortalController();
-  String selectedHospitalKO = SharedData.selectedHospitalKO;
+
   @override
   Widget build(BuildContext context) {
 
@@ -471,8 +469,6 @@ class MenuWidget extends StatefulWidget {
 }
 
 class _MenuWidgetState extends State<MenuWidget> {
-
-  String selectedHospitalKO = SharedData.selectedHospitalKO;
 
   @override
   Widget build(BuildContext context) {
