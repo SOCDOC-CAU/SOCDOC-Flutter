@@ -13,6 +13,7 @@ import 'package:socdoc_flutter/Utils/HospitalTypes.dart';
 
 bool isButtonPressed = false;
 bool isHospitalSelected = false;
+int pageIdx = 1;
 String? selectedValue1 = "0";
 String selectedHospitalKO = '전체';
 String curAddress1 = "서울특별시";
@@ -213,7 +214,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   void getHospitalList() {
     setState(() {
       http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?address1=$curAddress1&address2=$curAddress2"
-          "&pageNum=1&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
+          "&pageNum=$pageIdx&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
           .then((value){
         var tmp = jsonDecode(utf8.decode(value.bodyBytes));
         setState(() {
