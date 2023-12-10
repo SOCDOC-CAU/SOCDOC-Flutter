@@ -160,6 +160,77 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   String? selectedHospitalName; //여기다가 병원 진료과목 저장해두었습니다
   bool isHospitalSpecialtyPressed = false;
 
+
+  final titleHospital = TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo);
+
+  final edgeInsets = EdgeInsets.only(left: 16.0, top: 5.0);
+  final detailHospitalStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+
+  //병원 미리보기 카드
+  //-> 카드에서 주소
+  Widget HospitalAddress(String text) {
+    return Row(
+      children: [
+        Padding(padding: edgeInsets, child: Icon(Icons.location_on)),
+        Padding(padding: EdgeInsets.only(left: 10.0)),
+        Text(text, style: detailHospitalStyle),
+      ],
+    );
+  }
+
+  Widget HospitalCard(String text) {
+    return
+      SizedBox(
+        height: 265, width: double.infinity,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          elevation: 10.0,
+          surfaceTintColor: Colors.transparent,
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
+                child: Container(
+                  width: double.infinity,
+                  height: 150,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12.0), // 여기서 원하는 둥근 정도를 설정합니다.
+                    child:  Image(
+                      image: AssetImage('assets/images/hospital1.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(text, style: titleHospital),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top:5.0),
+                          child: Icon(Icons.star_rounded, color: Colors.amberAccent),
+                        ),
+                        Text("5.0"),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              HospitalAddress("동작구 상도동 4길 36"),
+            ],
+          ),
+        ),
+      );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -167,75 +238,26 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
     selectedValue1 = SortingCriteria[0];
   }
 
+  void getHospitalList() {
+    setState(() {
+      http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?address1=$curAddress1&address2=$curAddress2"
+          "&pageNum=1&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
+        .then((value){
+          var tmp = utf8.decode(value.bodyBytes);
+          print(tmp);
+          jsonDecode(tmp)["data"].forEach((item){
+            hospitalItemList.add(HospitalCard(item["name"]));
+            print(item["name"]);
+          });
+        }
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final edgeInsets = EdgeInsets.only(left: 16.0, top: 5.0);
-    final detailHospitalStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-    final titleHospital = TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo);
+    getHospitalList();
 
-    //병원 미리보기 카드
-    //-> 카드에서 주소
-    Widget HospitalAddress(String text) {
-      return Row(
-        children: [
-          Padding(padding: edgeInsets, child: Icon(Icons.location_on)),
-          Padding(padding: EdgeInsets.only(left: 10.0)),
-          Text(text, style: detailHospitalStyle),
-        ],
-      );
-    }
-    Widget HospitalCard(String text) {
-      return
-        SizedBox(
-          height: 265, width: double.infinity,
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            elevation: 10.0,
-            surfaceTintColor: Colors.transparent,
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
-                  child: Container(
-                    width: double.infinity,
-                    height: 150,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0), // 여기서 원하는 둥근 정도를 설정합니다.
-                      child:  Image(
-                        image: AssetImage('assets/images/hospital1.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(text, style: titleHospital),
-                      Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top:5.0),
-                            child: Icon(Icons.star_rounded, color: Colors.amberAccent),
-                          ),
-                          Text("5.0"),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                HospitalAddress("동작구 상도동 4길 36"),
-              ],
-            ),
-          ),
-        );
-    }
     //병원 미리보기 카드 끝
     Widget DropDownButton1() {
       return DropdownButtonHideUnderline(
@@ -327,21 +349,6 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
       );
     }
 
-    List<Widget> getHospitalCards() {
-
-      http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?address1=$curAddress1&address2=$curAddress2"
-          "&pageNum=1&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
-          .then((value){
-            var tmp = utf8.decode(value.bodyBytes);
-            jsonDecode(tmp)["data"].forEach((item){
-              hospitalItemList.add(HospitalCard(item["name"]));
-            });
-          }
-      );
-
-      return hospitalItemList;
-    }
-
     return Stack(
     children: [
     DraggableScrollableSheet(
@@ -390,9 +397,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                               ],
                             ),
                             SizedBox(height: 15),
-                            Column(
-                              children: hospitalItemList
-                            ),
+                            Column(children: hospitalItemList),
                           ],
                         ),
                       ),
