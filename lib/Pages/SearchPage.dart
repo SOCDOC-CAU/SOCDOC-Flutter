@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:socdoc_flutter/Pages/DetailPage.dart';
 import 'package:socdoc_flutter/style.dart';
@@ -17,6 +20,9 @@ final List<String> SortingCriteria = [
 ];
 String? selectedValue1;
 String selectedHospitalKO = '';
+String curAddress1 = "";
+String curAddress2 = "";
+
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
@@ -63,14 +69,37 @@ class _MapViewState extends State<MapView> {
   );
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _determinePosition();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initCoord,
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
+      },
+        onCameraIdle: () async {
+          GoogleMapController controller = await _controller.future;
+          var latlng = await controller.getVisibleRegion();
+          var lat = (latlng.northeast.latitude + latlng.southwest.latitude) / 2;
+          var lng = (latlng.northeast.longitude + latlng.southwest.longitude) / 2;
+
+          http.get(Uri.parse("https://dapi.kakao.com/v2/local/geo/coord2regioncode.JSON?x=${lng}&y=${lat}"),
+              headers: {
+                "Authorization": "KakaoAK ${dotenv.env['KAKAO_API_KEY']}"
+              }).then((res) {
+            var resJson = jsonDecode(res.body);
+
+            setState(() {
+              curAddress1 = resJson["documents"][0]["region_1depth_name"];
+              curAddress2 = resJson["documents"][0]["region_2depth_name"];
+              print("${curAddress1} ${curAddress2}");
+            });
+          });
       }
     );
   }
