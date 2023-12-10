@@ -9,12 +9,6 @@ import 'package:socdoc_flutter/style.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:socdoc_flutter/Utils/HospitalTypes.dart';
 
-late double _height=105;
-final double _lowLimit = 105;
-final double _highLimit = 710;
-final double _upThresh = 100;
-final double _boundary = 500;
-final double _downThresh = 550;
 bool isButtonPressed = false;
 bool isHospitalSelected = false;
 
@@ -140,7 +134,6 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _height = _lowLimit;
     isButtonPressed = true;
     selectedValue1 = SortingCriteria[0];
   }
@@ -392,7 +385,6 @@ class CustomDropDownState extends State<CustomDropDown> {
 
   final _link = LayerLink();
   double? _buttonWidth;
-  // String selectedHospitalKO = ''; // 추가: 선택된 병원 이름
   final OverlayPortalController _tooltipController = OverlayPortalController();
   String selectedHospitalKO = SharedData.selectedHospitalKO;
   @override
@@ -425,11 +417,9 @@ class CustomDropDownState extends State<CustomDropDown> {
         child: ElevatedButton(
           onPressed: () {
             setState(() {
-              _height = _highLimit;
               _tooltipController.toggle();
               isButtonPressed = !isButtonPressed;
             });
-
           },
           style: ElevatedButton.styleFrom(
             minimumSize: Size(108, 45),
