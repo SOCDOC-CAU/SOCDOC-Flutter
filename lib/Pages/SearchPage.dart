@@ -45,9 +45,8 @@ class SearchPage extends StatelessWidget {
               child: Stack(
                 children:[
                   MapView(),
-                 MapBottomSheet(),
+                  MapBottomSheet(),
                 ]
-
               ),
             )],
         )
