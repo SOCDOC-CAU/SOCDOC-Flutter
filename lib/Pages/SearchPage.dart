@@ -15,6 +15,7 @@ bool isButtonPressed = false;
 bool isHospitalSelected = false;
 int pageIdx = 1;
 String? selectedValue1 = "0";
+String selectedHospitalID = "D000";
 String selectedHospitalKO = '전체';
 String curAddress1 = "서울특별시";
 String curAddress2 = "동작구";
@@ -193,7 +194,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                                 margin: const EdgeInsets.only(right:20.0),
                                 child: DropDownButton1(),
                               ),
-                              const CustomDropDown(),
+                              CustomDropDown(updater: getHospitalList),
                             ],
                           ),
                           const SizedBox(height: 15),
@@ -213,10 +214,13 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
 
   void getHospitalList() {
     setState(() {
-      http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?address1=$curAddress1&address2=$curAddress2"
+      hospitalItemList.clear();
+      http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list${selectedHospitalID != "D000" ? '/$selectedHospitalID' : ''}"
+          "?address1=$curAddress1&address2=$curAddress2"
           "&pageNum=$pageIdx&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
           .then((value){
         var tmp = jsonDecode(utf8.decode(value.bodyBytes));
+        print("AAAAAAAA ${value.request}");
         setState(() {
           tmp["data"].forEach((item){
             hospitalItemList.add(HospitalCard(item["name"]));
@@ -307,6 +311,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
         onChanged: (value) {
           setState(() {
             selectedValue1 = value;
+            getHospitalList();
           });
         },
         selectedItemBuilder: (BuildContext context) {
@@ -374,7 +379,10 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
 class CustomDropDown extends StatefulWidget {
   const CustomDropDown({
     super.key,
+    required this.updater
   });
+
+  final Function updater;
 
   @override
   State<StatefulWidget> createState() => CustomDropDownState();
@@ -406,6 +414,7 @@ class CustomDropDownState extends State<CustomDropDown> {
                     selectedHospitalKO = selectedItem;
                     _tooltipController.toggle();
                     isButtonPressed = true;
+                    widget.updater();
                   });
                 },
               ),
@@ -529,6 +538,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                       tileColor: Colors.white,
                       onTap: () {
                         setState(() {
+                          selectedHospitalID = hospitalItem.id;
                           selectedHospitalKO = hospitalItem.ko;
                           widget.onItemSelected?.call(selectedHospitalKO);
                           isHospitalSelected = true;
