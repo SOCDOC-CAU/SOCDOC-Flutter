@@ -184,7 +184,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left:25.0, right:25.0, top:20.0 ),
+                      padding: const EdgeInsets.only(left:25.0, right:25.0, top:20.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -200,7 +200,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                           const SizedBox(height: 15),
                           hospitalItemList.isNotEmpty
                               ? Column(children: hospitalItemList)
-                              : SizedBox(height: double.infinity, child: circularProgress())
+                              : Column(mainAxisSize: MainAxisSize.max, children: [circularProgress()],)
                         ],
                       ),
                     ),
