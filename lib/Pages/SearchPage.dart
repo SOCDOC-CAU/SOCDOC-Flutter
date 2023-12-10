@@ -18,10 +18,10 @@ final List<String> SortingCriteria = [
   '별점순',
   '이름순',
 ];
-String? selectedValue1;
-String selectedHospitalKO = '';
-String curAddress1 = "";
-String curAddress2 = "";
+String? selectedValue1 = "0";
+String selectedHospitalKO = '전체';
+String curAddress1 = "서울시";
+String curAddress2 = "동작구";
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
@@ -326,10 +326,6 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
 
     return Stack(
     children: [
-        Container(
-            color: Colors.white,
-            child: Text("지도"),
-    ),
     DraggableScrollableSheet(
     // 화면 비율로 높이 조정
         initialChildSize: 0.14,
