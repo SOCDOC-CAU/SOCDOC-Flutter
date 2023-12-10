@@ -42,18 +42,13 @@ class _HomePageState extends State<HomePage> {
   }
   Future<void> userLocation() async {
     http.get(Uri.parse("https://socdoc.dev-lr.com/api/user?userId=${getUserID()}"))
-        .then((value){
-      setState(() {
+        .then((value)async {
         var tmp = utf8.decode(value.bodyBytes);
         UserLocationData = jsonDecode(tmp)["data"];
         address1 = UserLocationData['address1'];
         address2 = UserLocationData['address2'];
-        // print(value.body);
-        // print("UserLocationData"+UserLocationData);
-
-      });
-    })
-        .onError((error, stackTrace){
+        await MainFamousHospitalInfo();
+    }).onError((error, stackTrace){
       print(error);
       print(stackTrace);
     });
@@ -65,10 +60,6 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
         FamousHospitalData = jsonDecode(tmp)["data"];
-        // print(value.body);
-        // print(FamousHospitalData);
-        // print(address1);
-        // print(address2);
         isLoading_hospital = false;
       });
     })
@@ -80,18 +71,28 @@ class _HomePageState extends State<HomePage> {
   Widget MainFamousHospital(){
     if(isLoading_hospital){
       return circularProgress();
-    }else if(FamousHospitalData != null){
-      return ListView.builder(
+    }else if(FamousHospitalData != null && FamousHospitalData.length > 0){
+      print(FamousHospitalData.toString());
+      return
+        SizedBox(
+          height: 350.0,
+          child: ListView.builder(
 
-          itemCount: FamousHospitalData.length,
-          itemBuilder: (context, index) {
-            var hospital =  FamousHospitalData[index];
-            String hospitalName = hospital["name"];
-            String hospitalAddress = hospital["address"];
-            String hospitalRating = hospital["rating"].toString();
-            return HospitalCard(hospitalName, hospitalAddress,hospitalRating);
-          },
+              itemCount: FamousHospitalData.length,
+              itemBuilder: (context, index) {
+                var hospital =  FamousHospitalData[index];
+                String hospitalName = hospital["name"];
+                String hospitalAddress = hospital["address"];
+                String hospitalRating = hospital["rating"].toString();
+
+                print("1sdfds"+hospitalName);
+                print(hospitalAddress);
+                print(hospitalRating);
+                return HospitalCard(hospitalName, hospitalAddress,hospitalRating);
+              },
+            ),
         );
+
         }
     else{
       return Text("데이터를 불러오는 중에 오류가 발생했습니다.");
@@ -101,8 +102,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    MainFamousHospitalInfo();
-    userLocation();
+    userLocation().then((value){
+    }).onError((error, stackTrace){
+      print(error.toString());
+    });
     WidgetsBinding.instance.addObserver(
       _LifecycleObserver(resumeCallback: () async => loadSelectedIndices())
     );
@@ -265,7 +268,7 @@ class _HomePageState extends State<HomePage> {
       children: [
         Padding(padding: edgeInsets, child: Icon(Icons.location_on)),
         Padding(padding: EdgeInsets.only(left: 10.0)),
-        Text(text, style: detailHospitalStyle),
+        Text(text,overflow: TextOverflow.ellipsis, style: detailHospitalStyle),
       ],
     );
   }
@@ -305,7 +308,9 @@ class _HomePageState extends State<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(text, style: titleHospital),
+                      Text(text,
+                          overflow: TextOverflow.ellipsis,
+                          style: titleHospital),
                       Column(
                         children: [
                           Padding(
@@ -327,7 +332,8 @@ class _HomePageState extends State<HomePage> {
   }
   //우리 동네 인기병원
   Widget FamousHospital(){
-    return Container(
+    return
+      Container(
       child:
       Padding(
         padding: const EdgeInsets.only(top:25.0),
