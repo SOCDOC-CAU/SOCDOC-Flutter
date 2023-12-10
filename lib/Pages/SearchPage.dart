@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:label_marker/label_marker.dart';
 
 import 'package:socdoc_flutter/style.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -20,6 +21,7 @@ String selectedHospitalKO = '전체';
 String curAddress1 = "서울특별시";
 String curAddress2 = "동작구";
 
+Set<Marker> mapMarkers = {};
 const List<String> SortingCriteria = ['별점순', '이름순'];
 
 class SearchPage extends StatelessWidget {
@@ -67,6 +69,7 @@ class _MapViewState extends State<MapView> {
   Widget build(BuildContext context) {
     return GoogleMap(
       mapType: MapType.normal,
+      markers: mapMarkers,
       initialCameraPosition: initCoord,
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
@@ -252,6 +255,12 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
         setState(() {
           tmp["data"].forEach((item){
             hospitalItemList.add(HospitalCard(item["name"]));
+            mapMarkers.addLabelMarker(LabelMarker(
+              label: item["name"],
+              markerId: MarkerId(item["name"]),
+              position: LatLng(item["latitude"], item["longitude"]),
+              backgroundColor: Colors.green,
+            ));
           });
         });
       });
