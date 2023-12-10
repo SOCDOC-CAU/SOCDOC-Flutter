@@ -23,6 +23,8 @@ class _DetailPageState extends State<DetailPage> {
   final detailPharmacyStyle = TextStyle(fontSize: 17, fontWeight: FontWeight.bold);
   final titlePharmacy = TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue);
   var hospitalDetail = null;
+  String hpName = "";
+  String hpId = "";
   var pharmacyDetail = null;
   var hospitalReview = null;
   bool isLoading_hospital = true;
@@ -171,7 +173,7 @@ class _DetailPageState extends State<DetailPage> {
         itemCount: hospitalReview.length,
         itemBuilder: (context, index) {
           var review = hospitalReview[index];
-          String userName = review["userName"];
+          String userName = review["name"];
           String reviewCreatedAt = review["createdAt"];
           String content = review["content"];
           String rating = review["rating"].toString();
@@ -322,6 +324,8 @@ class _DetailPageState extends State<DetailPage> {
         setState(() {
           var tmp = utf8.decode(value.bodyBytes);
           hospitalDetail = jsonDecode(tmp)["data"];
+          hpId = hospitalDetail["hpid"];
+          hpName = hospitalDetail["name"];
           print(value.body);
           print(hospitalDetail);
           isLoading_hospital = false;
@@ -425,7 +429,7 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                         floatingActionButton: FloatingActionButton(
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ReviewPage(hospitalID: "AA1100001", hospitalName: "병원AA",)));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ReviewPage(hospitalID: hpId, hospitalName: hpName)));
                           },
                           backgroundColor: Colors.white,
                           child: const Icon(
