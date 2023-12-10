@@ -18,16 +18,31 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isLoading_hospital = true;
+  var FamousHospital;
+  Widget circularProgress(){
+    return Center(
+      child: Container(
+          alignment: Alignment.center,
+          color: Colors.white,
+          child: Container(
+              width: 100,
+              height: 100,
+              child: CircularProgressIndicator()
+          )
+      ),
+    );
+  }
 
-  Future<void> MainFamousHospital() async {
+  Future<void> MainFamousHospitalInfo() async {
     http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?"
         "address1=${widget.address1}&address1=${widget.address2}&pageNum=1&sortType=0"))
         .then((value){
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
         FamousHospital = jsonDecode(tmp)["data"];
-        print(value.body);
-        print(hospitalDetail);
+        // print(value.body);
+        // print(hospitalDetail);
         isLoading_hospital = false;
       });
     })
@@ -36,11 +51,30 @@ class _HomePageState extends State<HomePage> {
       print(stackTrace);
     });
   }
+  Widget MainFamousHospital(){
+    if(isLoading_hospital){
+      return circularProgress();
+    }else if(FamousHospital != null){
+      return ListView.builder(
+          itemCount: FamousHospital.length,
+          itemBuilder: (context, index) {
+            var hospital =  FamousHospital[index];
+            String hospitalName = hospital["name"];
+            String hospitalAddress = hospital["address"];
+            String hospitalRating = hospital["rating"].toString();
+            return HospitalCard(hospitalName, hospitalAddress,hospitalRating);
+          },
+        );
+        }
+    else{
+      return Text("데이터를 불러오는 중에 오류가 발생했습니다.");
+    }
+  }
   List<int> selectedTileIndices = [1,5,8,12];
   @override
   void initState() {
     super.initState();
-    MainFamousHospital();
+    MainFamousHospitalInfo();
     WidgetsBinding.instance.addObserver(
       _LifecycleObserver(resumeCallback: () async => loadSelectedIndices())
     );
@@ -159,6 +193,7 @@ class _HomePageState extends State<HomePage> {
 
       );
     }
+    //우리 동네 병원 한 눈에 보기
     Widget NearbyHospital(){
       return Column(
         children: [
@@ -212,6 +247,7 @@ class _HomePageState extends State<HomePage> {
         ],
       );
     }
+    //카드 안에 주소
     Widget HospitalAddress(String text) {
       return Row(
         children: [
@@ -221,58 +257,63 @@ class _HomePageState extends State<HomePage> {
         ],
       );
     }
-    Widget HospitalCard(String text) {
+    //카드
+    Widget HospitalCard(String text, String address, String rating) {
       return
-        SizedBox(
-          height: 265, width: double.infinity,
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            elevation: 10.0,
-            surfaceTintColor: Colors.transparent,
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
-                  child: Container(
-                    width: double.infinity,
-                    height: 150,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0), // 여기서 원하는 둥근 정도를 설정합니다.
-                      child:  Image(
-                        image: AssetImage('assets/images/hospital1.png'),
-                        fit: BoxFit.cover,
+        Padding(
+          padding: const EdgeInsets.only(top : 20.0),
+          child: SizedBox(
+            height: 265, width: double.infinity,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              elevation: 10.0,
+              surfaceTintColor: Colors.transparent,
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
+                    child: Container(
+                      width: double.infinity,
+                      height: 150,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0), // 여기서 원하는 둥근 정도를 설정합니다.
+                        child:  Image(
+                          image: AssetImage('assets/images/hospital1.png'),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(text, style: titleHospital),
-                      Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top:5.0),
-                            child: Icon(Icons.star_rounded, color: Colors.amberAccent),
-                          ),
-                          Text("5.0"),
-                        ],
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(text, style: titleHospital),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top:5.0),
+                              child: Icon(Icons.star_rounded, color: Colors.amberAccent),
+                            ),
+                            Text(rating),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                HospitalAddress("동작구 상도동 4길 36"),
-              ],
+                  HospitalAddress(address),
+                ],
+              ),
             ),
           ),
         );
     }
+    //우리 동네 인기병원
     Widget FamousHospital(){
       return Container(
         child:
@@ -286,7 +327,7 @@ class _HomePageState extends State<HomePage> {
                 margin: EdgeInsets.only(top: 5.0), // Text와 NearbyPharmacy 사이의 간격을 설정
                 child: Column(
                   children: [
-                    HospitalCard('서울연세이비인후과'),
+                    MainFamousHospital(),
 
                   ],
                 ),
@@ -312,6 +353,8 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       NearbyHospital(),
                       FamousHospital(),
+
+                      //FamousHospital(),
                     ],
                   )
               ),
