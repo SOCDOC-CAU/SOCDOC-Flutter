@@ -360,6 +360,7 @@ class _DetailPageState extends State<DetailPage> {
                           SizedBox(width: 25.0),
                           Container(
                             width: 300,
+                            alignment: Alignment.center,
                             child: Text(
                               hospitalDetail["name"],
                               overflow: TextOverflow.ellipsis,
