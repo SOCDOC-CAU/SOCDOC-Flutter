@@ -15,11 +15,10 @@ bool isButtonPressed = false;
 bool isHospitalSelected = false;
 String? selectedValue1 = "0";
 String selectedHospitalKO = '전체';
-String curAddress1 = "서울시";
+String curAddress1 = "서울특별시";
 String curAddress2 = "동작구";
 
 const List<String> SortingCriteria = ['별점순', '이름순'];
-List<Widget> hospitalItemList = [];
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
@@ -143,14 +142,15 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   bool isSelected =  false;
   String? selectedHospitalName;
 
+  List<Widget> hospitalItemList = [];
+
   @override
   void initState() {
     super.initState();
-    setState(() {
-      isButtonPressed = true;
-      selectedValue1 = SortingCriteria[0];
-      getHospitalList();
-    });
+    isButtonPressed = true;
+    selectedValue1 = SortingCriteria[0];
+
+    getHospitalList();
   }
 
   @override
@@ -165,45 +165,42 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
             return SingleChildScrollView(
               controller: scrollController,
               child: Container(
-                height: 1500,
                 decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
-                    color: Colors.white),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      Container(
-                        width: 70,
-                        height: 4.5,
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20)),
+                  color: Colors.white),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    Container(
+                      width: 70,
+                      height: 4.5,
+                      decoration: const BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left:25.0, right:25.0, top:20.0 ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right:20.0),
-                                  child: DropDownButton1(),
-                                ),
-                                const CustomDropDown(),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Column(children: hospitalItemList),
-                          ],
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left:25.0, right:25.0, top:20.0 ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(right:20.0),
+                                child: DropDownButton1(),
+                              ),
+                              const CustomDropDown(),
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          Column(children: hospitalItemList),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -218,11 +215,11 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
       http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?address1=$curAddress1&address2=$curAddress2"
           "&pageNum=1&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
           .then((value){
-        var tmp = utf8.decode(value.bodyBytes);
-        print(tmp);
-        jsonDecode(tmp)["data"].forEach((item){
-          hospitalItemList.add(HospitalCard(item["name"]));
-          print(item["name"]);
+        var tmp = jsonDecode(utf8.decode(value.bodyBytes));
+        setState(() {
+          tmp["data"].forEach((item){
+            hospitalItemList.add(HospitalCard(item["name"]));
+          });
         });
       });
     });
