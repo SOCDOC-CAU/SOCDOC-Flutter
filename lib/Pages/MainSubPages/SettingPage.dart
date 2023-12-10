@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:socdoc_flutter/Utils/AuthUtil.dart';
 import 'package:socdoc_flutter/main.dart';
@@ -27,9 +28,14 @@ class _SettingPageState extends State<SettingPage> {
   @override
   void initState() {
     super.initState();
-    userInfo();
     favoriteHospitalInfo();
     userReviewInfo();
+    WidgetsBinding.instance.addObserver(
+        _LifecycleObserver(resumeCallback: () async => userInfo())
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      userInfo();
+    });
   }
 
   Widget circularProgress(){
@@ -38,8 +44,8 @@ class _SettingPageState extends State<SettingPage> {
           alignment: Alignment.center,
           color: Colors.white,
           child: Container(
-              width: 100,
-              height: 100,
+              width: 50,
+              height: 50,
               child: CircularProgressIndicator()
           )
       ),
@@ -86,10 +92,10 @@ class _SettingPageState extends State<SettingPage> {
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
         userReview = jsonDecode(tmp)["data"];
-        print("********^^좋아요누른병원**");
+        print("***내 리뷰 보기***");
         print(value.body);
         print(userReview);
-        isLoading_favoriteHospital = false;
+        isLoading_userReview = false;
       });
     })
         .onError((error, stackTrace){
@@ -316,14 +322,22 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget MyReviewList(){
+    if(isLoading_userReview) return circularProgress();
     return Container(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          myReview("흑석성모안과의원", "2023.09.01", "다 좋은데 줄이 너무 길어요..", "4.0", 'assets/hospital2.png'),
-          SizedBox(height: 10.0),
-          myReview("연세이비인후과", "2023.10.23", "간호사가 별로에요.", "3.0", 'assets/hospital3.png'),
-        ],
+      child: ListView.builder(
+        itemCount: userReview.length,
+        itemBuilder: (context, index){
+          var review = userReview[index];
+          String reviewContent = review["content"];
+          String reviewDate = review["createdAt"];
+          String reviewRate = review["rating"];
+          String hospitalName = review["name"];
+          return Container(
+            height: 150,
+            child: myReview(hospitalName, reviewDate, reviewContent, reviewRate, 'assets/hospital2.png')
+          );
+        },
       ),
     );
   }
@@ -481,6 +495,32 @@ class _SettingPageState extends State<SettingPage> {
       socdocApp.setState(() {
         socdocApp.isLoggedIn = false;
       });
+    }
+  }
+}
+
+class _LifecycleObserver extends WidgetsBindingObserver {
+  final AsyncCallback? resumeCallback;
+
+  _LifecycleObserver({
+    this.resumeCallback
+  });
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    switch(state) {
+      case AppLifecycleState.resumed:
+        if(resumeCallback != null){
+          await resumeCallback!();
+        }
+        break;
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+        break;
     }
   }
 }
