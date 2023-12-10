@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:label_marker/label_marker.dart';
+import 'package:socdoc_flutter/Pages/DetailPage.dart';
 
 import 'package:socdoc_flutter/style.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -254,7 +255,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
         var tmp = jsonDecode(utf8.decode(value.bodyBytes));
         setState(() {
           tmp["data"].forEach((item){
-            hospitalItemList.add(HospitalCard(item["name"]));
+            hospitalItemList.add(HospitalCard(item["name"], item["address"], item["hpid"]));
             mapMarkers.addLabelMarker(LabelMarker(
               label: item["name"],
               markerId: MarkerId(item["name"]),
@@ -267,61 +268,66 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
     });
   }
 
-  Widget HospitalCard(String text) {
-    return SizedBox(
-      height: 265, width: double.infinity,
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        elevation: 10.0,
-        surfaceTintColor: Colors.transparent,
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 150,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
-                  child:  const Image(
-                    image: AssetImage('assets/images/hospital1.png'),
-                    fit: BoxFit.cover,
+  Widget HospitalCard(String name, String address, String hospitalID) {
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(hpid: hospitalID)));
+      },
+      child: SizedBox(
+        height: 265, width: double.infinity,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          elevation: 10.0,
+          surfaceTintColor: Colors.transparent,
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 150,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12.0),
+                    child:  const Image(
+                      image: AssetImage('assets/images/hospital1.png'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(text,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
-                  const Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top:5.0),
-                        child: Icon(Icons.star_rounded, color: Colors.amberAccent),
-                      ),
-                      Text("5.0"),
-                    ],
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(name,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
+                    const Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top:5.0),
+                          child: Icon(Icons.star_rounded, color: Colors.amberAccent),
+                        ),
+                        Text("5.0"),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Row(
-              children: [
-                const Padding(padding: EdgeInsets.only(left: 16.0, top: 5.0), child: Icon(Icons.location_on)),
-                const Padding(padding: EdgeInsets.only(left: 10.0)),
-                Text(text,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
-              ],
-            )
-          ],
+              Row(
+                children: [
+                  const Padding(padding: EdgeInsets.only(left: 16.0, top: 5.0), child: Icon(Icons.location_on)),
+                  const Padding(padding: EdgeInsets.only(left: 10.0)),
+                  Text(address,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
