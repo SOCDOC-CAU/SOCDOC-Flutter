@@ -24,6 +24,7 @@ class _SettingPageState extends State<SettingPage> {
   void initState() {
     super.initState();
     userInfo();
+    favoriteHospitalInfo();
   }
 
   Widget circularProgress(){
@@ -62,6 +63,7 @@ class _SettingPageState extends State<SettingPage> {
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
         favoriteHospital = jsonDecode(tmp)["data"];
+        print("********^^좋아요누른병원**");
         print(value.body);
         print(favoriteHospital);
         isLoading_favoriteHospital = false;
@@ -242,12 +244,12 @@ class _SettingPageState extends State<SettingPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue)),
+                  Text(name, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue)),
                   SizedBox(height: 5.0),
                   Row(
                     children: [
                       Icon(Icons.location_on, size: 15),
-                      Text(address, style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black54)),
+                      Text(address, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black54)),
                     ],
                   ),
                 ],
@@ -260,19 +262,21 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget FavoriteHospital(){
+    if(isLoading_favoriteHospital) return circularProgress();
     return Container(
-      child: SingleChildScrollView(
+      height: 180,
+      child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            HospitalInfo("흑석성모안과의원", "동작구 상도로 36길", 'assets/hospital2.png'),
-            SizedBox(width: 35.0),
-            HospitalInfo("연세이비인후과", "동작구 상도로 17길", 'assets/hospital3.png'),
-            SizedBox(width: 35.0),
-            HospitalInfo("서울성모안과의원", "동작구 상도로 36길", 'assets/hospital2.png'),
-          ],
-        ),
+        itemCount: favoriteHospital.length,
+        itemBuilder: (context, index){
+          var hospital = favoriteHospital[index];
+          String hospitalName = hospital["name"];
+          String hospitalAddress = hospital["address"];
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: HospitalInfo(hospitalName, hospitalAddress, 'assets/hospital2.png'),
+          );
+        },
       ),
     );
   }
