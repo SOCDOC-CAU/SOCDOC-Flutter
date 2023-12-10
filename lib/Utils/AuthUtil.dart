@@ -6,11 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:socdoc_flutter/Utils/SocdocAuthProvider.dart';
 
 String getUserID(BuildContext context) {
-  return context.watch<SocdocAuthProvider>().userID;
+  print("UID" + context.read<SocdocAuthProvider>().userID);
+  return context.read<SocdocAuthProvider>().userID;
 }
 
 Future<String?> getUserToken(BuildContext context) async {
-  return context.watch<SocdocAuthProvider>().userToken;
+  return context.read<SocdocAuthProvider>().userToken;
 }
 
 Future<String?> tryAppleLogin() async {
@@ -39,8 +40,9 @@ Future<void> tryLogin(context, var type) async {
       headers: {
         "authToken": userToken!
       }).then((value){
-      context.watch<AuthProvider>().updateUser(FirebaseAuth.instance.currentUser!.uid, userToken);
-    })});
+        context.read<SocdocAuthProvider>().updateUser();
+      })
+  });
 }
 
 Future<bool> tryLogout() async {
