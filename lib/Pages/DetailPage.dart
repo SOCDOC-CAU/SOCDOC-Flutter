@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:socdoc_flutter/Utils/AuthUtil.dart';
 import 'package:socdoc_flutter/Utils/Color.dart';
@@ -313,9 +314,14 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(
+        _LifecycleObserver(resumeCallback: () async => reviewInfo())
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      reviewInfo();
+    });
     hospitalDetailInfo();
     pharmacyInfo();
-    reviewInfo();
   }
 
   Future<void> hospitalDetailInfo() async {
@@ -456,5 +462,32 @@ class _DetailPageState extends State<DetailPage> {
   @override
   Widget build(BuildContext context) {
     return displayHospitalDetail();
+  }
+
+}
+
+class _LifecycleObserver extends WidgetsBindingObserver {
+  final AsyncCallback? resumeCallback;
+
+  _LifecycleObserver({
+    this.resumeCallback
+  });
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    switch(state) {
+      case AppLifecycleState.resumed:
+        if(resumeCallback != null){
+          await resumeCallback!();
+        }
+        break;
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+        break;
+    }
   }
 }
