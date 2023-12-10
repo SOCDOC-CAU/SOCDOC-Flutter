@@ -325,13 +325,16 @@ class _SettingPageState extends State<SettingPage> {
     if(isLoading_userReview) return circularProgress();
     return Container(
       padding: const EdgeInsets.all(8.0),
+      height: 150,
       child: ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
         itemCount: userReview.length,
         itemBuilder: (context, index){
           var review = userReview[index];
           String reviewContent = review["content"];
           String reviewDate = review["createdAt"];
-          String reviewRate = review["rating"];
+          String reviewRate = review["rating"].toString();
           String hospitalName = review["name"];
           return Container(
             height: 150,
