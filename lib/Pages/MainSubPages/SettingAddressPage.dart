@@ -9,7 +9,9 @@ import 'package:http/http.dart' as http;
 import 'package:socdoc_flutter/Utils/AuthUtil.dart';
 
 class SettingAddressPage extends StatefulWidget {
-  const SettingAddressPage({Key? key}) : super(key: key);
+  final Function()? onAddressUpdate;
+
+  const SettingAddressPage({Key? key, this.onAddressUpdate}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SettingAddressPageState();
@@ -36,7 +38,7 @@ class _SettingAddressPageState extends State<SettingAddressPage> {
         actions: [
           IconButton(
             onPressed: (){
-              _uploadData().then((value) => Navigator.pop(context));
+              _uploadData();
             }, icon: const Icon(Icons.check))
         ],
       ),
@@ -95,7 +97,12 @@ class _SettingAddressPageState extends State<SettingAddressPage> {
         "address1": curAddress1,
         "address2": curAddress2,
         "userId": getUserID()
-      }));
+      })).then((res){
+        if(res.statusCode == 200) {
+          widget.onAddressUpdate?.call();
+          Navigator.pop(context);
+        }
+    });
   }
 
   Future<void> _determinePosition() async {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:socdoc_flutter/Utils/AuthUtil.dart';
 import 'package:socdoc_flutter/Utils/Color.dart';
@@ -23,6 +24,8 @@ class _DetailPageState extends State<DetailPage> {
   final detailPharmacyStyle = TextStyle(fontSize: 17, fontWeight: FontWeight.bold);
   final titlePharmacy = TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue);
   var hospitalDetail = null;
+  String hpName = "";
+  String hpId = "";
   var pharmacyDetail = null;
   var hospitalReview = null;
   bool isLoading_hospital = true;
@@ -47,7 +50,7 @@ class _DetailPageState extends State<DetailPage> {
     return Row(
       children: [
         Padding(padding: edgeInsets, child: Icon(icon, size: 23,)),
-        Padding(padding: EdgeInsets.only(left: 10.0, top: 5.0)),
+        const Padding(padding: EdgeInsets.only(left: 10.0, top: 5.0)),
         Text(text, style: detailTextStyle),
         if (dropdownItems != null)
           DropdownButton<String>(
@@ -100,7 +103,7 @@ class _DetailPageState extends State<DetailPage> {
         Row(
           children: [
             Padding(padding: edgeInsets, child: Icon(Icons.location_on)),
-            Padding(padding: EdgeInsets.only(left: 10.0)),
+            const Padding(padding: EdgeInsets.only(left: 10.0)),
             Text(address, style: detailPharmacyStyle),
           ],
         ),
@@ -143,7 +146,7 @@ class _DetailPageState extends State<DetailPage> {
         },
       );
     } else {
-      return Text("데이터를 불러오는 중에 오류가 발생했습니다.");
+      return const Text("데이터를 불러오는 중에 오류가 발생했습니다.");
     }
   }
 
@@ -171,7 +174,7 @@ class _DetailPageState extends State<DetailPage> {
         itemCount: hospitalReview.length,
         itemBuilder: (context, index) {
           var review = hospitalReview[index];
-          String userName = review["userName"];
+          String userName = review["name"];
           String reviewCreatedAt = review["createdAt"];
           String content = review["content"];
           String rating = review["rating"].toString();
@@ -180,17 +183,17 @@ class _DetailPageState extends State<DetailPage> {
         },
       );
     } else {
-      return Text("데이터를 불러오는 중에 오류가 발생했습니다.");
+      return const Text("데이터를 불러오는 중에 오류가 발생했습니다.");
     }
   }
 
   Widget reviewTab(userName, reviewCreatedAt, content, rating) {
     return Container(
-      padding: EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -204,26 +207,26 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                 ),
               ),
-              SizedBox(width: 10.0),
+              const SizedBox(width: 10.0),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(userName, style: TextStyle(fontSize: 18)),
-                    Text(reviewCreatedAt, style: TextStyle(fontSize: 12)),
+                    Text(userName, style: const TextStyle(fontSize: 18)),
+                    Text(reviewCreatedAt, style: const TextStyle(fontSize: 12)),
                   ],
                 ),
               ),
-              SizedBox(width: 140.0),
+              const SizedBox(width: 140.0),
               Column(
                 children: [
-                  Icon(Icons.star_rounded, color: Colors.amberAccent),
+                  const Icon(Icons.star_rounded, color: Colors.amberAccent),
                   Text(rating),
                 ],
               ),
             ],
           ),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Container(
             alignment: Alignment.centerRight,
             child: Card(
@@ -241,9 +244,9 @@ class _DetailPageState extends State<DetailPage> {
                       padding: const EdgeInsets.only(
                           left: 20.0, top: 15.0, bottom: 5.0),
                       child: Text(content,
-                          style: TextStyle(fontSize: 18, color: Colors.white)),
+                          style: const TextStyle(fontSize: 18, color: Colors.white)),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 30,
                       width: double.infinity,
                     ),
@@ -302,8 +305,8 @@ class _DetailPageState extends State<DetailPage> {
         });
       },
       child: hospitalDetail["userLiked"] == false
-          ? Icon(Icons.favorite_outline_rounded, color: Colors.pink, size: 30.0)
-          : Icon(Icons.favorite_rounded, color: Colors.pink, size: 30.0),
+          ? const Icon(Icons.favorite_outline_rounded, color: Colors.pink, size: 30.0)
+          : const Icon(Icons.favorite_rounded, color: Colors.pink, size: 30.0),
     );
   }
 
@@ -311,9 +314,14 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
-    hospitalDetailInfo();
+    WidgetsBinding.instance.addObserver(
+        _LifecycleObserver(resumeCallback: () async { reviewInfo(); hospitalDetailInfo();})
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      reviewInfo();
+      hospitalDetailInfo();
+    });
     pharmacyInfo();
-    reviewInfo();
   }
 
   Future<void> hospitalDetailInfo() async {
@@ -322,6 +330,8 @@ class _DetailPageState extends State<DetailPage> {
         setState(() {
           var tmp = utf8.decode(value.bodyBytes);
           hospitalDetail = jsonDecode(tmp)["data"];
+          hpId = hospitalDetail["hpid"];
+          hpName = hospitalDetail["name"];
           print(value.body);
           print(hospitalDetail);
           isLoading_hospital = false;
@@ -344,25 +354,27 @@ class _DetailPageState extends State<DetailPage> {
                 Container(
                   width: 400,
                   height: 200,
-                  child: Image(
+                  child: const Image(
                     image: AssetImage('assets/hospital3.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          SizedBox(width: 15.0),
-                          Expanded(
+                          SizedBox(width: 25.0),
+                          Container(
+                            width: 300,
+                            alignment: Alignment.center,
                             child: Text(
                               hospitalDetail["name"],
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 24,
                               ),
@@ -376,7 +388,7 @@ class _DetailPageState extends State<DetailPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       detailHospital(Icons.call, hospitalDetail["phone"]),
                       detailHospital(Icons.location_on, hospitalDetail["address"]),
                       detailHospital(Icons.subway, hospitalDetail["description"] == null ? "정보가 없습니다." : hospitalDetail["description"]),
@@ -410,8 +422,8 @@ class _DetailPageState extends State<DetailPage> {
                               Row(
                                 children: [
                                   Text("전체 평점", style: detailTextStyle),
-                                  SizedBox(width: 10.0),
-                                  Icon(Icons.star_rounded, color: Colors.amberAccent),
+                                  const SizedBox(width: 10.0),
+                                  const Icon(Icons.star_rounded, color: Colors.amberAccent),
                                   Text(hospitalDetail["rating"].toString(), style: detailTextStyle),
                                 ],
                               ),
@@ -423,10 +435,10 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                         floatingActionButton: FloatingActionButton(
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ReviewPage(hospitalID: "AA1100001", hospitalName: "병원AA",)));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ReviewPage(hospitalID: hpId, hospitalName: hpName)));
                           },
                           backgroundColor: Colors.white,
-                          child: Icon(
+                          child: const Icon(
                             Icons.rate_review_outlined,
                             color: AppColor.SocdocBlue,
                           ),
@@ -450,5 +462,32 @@ class _DetailPageState extends State<DetailPage> {
   @override
   Widget build(BuildContext context) {
     return displayHospitalDetail();
+  }
+
+}
+
+class _LifecycleObserver extends WidgetsBindingObserver {
+  final AsyncCallback? resumeCallback;
+
+  _LifecycleObserver({
+    this.resumeCallback
+  });
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    switch(state) {
+      case AppLifecycleState.resumed:
+        if(resumeCallback != null){
+          await resumeCallback!();
+        }
+        break;
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+        break;
+    }
   }
 }

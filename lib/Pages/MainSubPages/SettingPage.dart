@@ -1,13 +1,130 @@
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:socdoc_flutter/Utils/AuthUtil.dart';
 import 'package:socdoc_flutter/main.dart';
 import 'package:socdoc_flutter/Utils/Color.dart';
 import 'package:socdoc_flutter/Pages/MainSubPages/SettingAddressPage.dart';
+import 'package:socdoc_flutter/Pages/DetailPage.dart';
+import 'dart:convert';
+import "package:http/http.dart" as http;
 
-class SettingPage extends StatelessWidget {
+
+class SettingPage extends StatefulWidget{
   const SettingPage({Key? key});
 
   @override
+  State<StatefulWidget> createState() => _SettingPageState();
+}
+
+class _SettingPageState extends State<SettingPage> {
+  String userName = "";
+  String userAddress = "";
+  var favoriteHospital = null;
+  var userReview = null;
+  bool isLoading_userInfo = true;
+  bool isLoading_favoriteHospital = true;
+  bool isLoading_userReview = true;
+
+  void _updateUserInfo() {
+    userInfo();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(
+      _LifecycleObserver(resumeCallback: () async {
+        userInfo();
+        userReviewInfo();
+        favoriteHospitalInfo();
+      })
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      userInfo();
+      userReviewInfo();
+      favoriteHospitalInfo();
+    });
+  }
+
+  Widget circularProgress(){
+    return Center(
+      child: Container(
+          alignment: Alignment.center,
+          color: Colors.white,
+          child: Container(
+              width: 50,
+              height: 50,
+              child: CircularProgressIndicator()
+          )
+      ),
+    );
+  }
+
+  Future<void> userInfo() async {
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/user?userId=${getUserID()}"))
+        .then((value){
+      setState(() {
+        var tmp = utf8.decode(value.bodyBytes);
+        userName = jsonDecode(tmp)["data"]["userName"];
+        userAddress = jsonDecode(tmp)["data"]["address1"] + ' '+ jsonDecode(tmp)["data"]["address2"];
+        print(value.body);
+        isLoading_userInfo = false;
+      });
+    }).onError((error, stackTrace){
+      print(error);
+      print(stackTrace);
+    });
+  }
+
+  Future<void> favoriteHospitalInfo() async {
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/like?userId=${getUserID()}"))
+        .then((value){
+      setState(() {
+        var tmp = utf8.decode(value.bodyBytes);
+        favoriteHospital = jsonDecode(tmp)["data"];
+        print("********^^좋아요누른병원**");
+        print(value.body);
+        print(favoriteHospital);
+        isLoading_favoriteHospital = false;
+      });
+    })
+        .onError((error, stackTrace){
+      print(error);
+      print(stackTrace);
+    });
+  }
+
+  Future<void> userReviewInfo() async {
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/review/user?userId=${getUserID()}"))
+        .then((value){
+      setState(() {
+        var tmp = utf8.decode(value.bodyBytes);
+        userReview = jsonDecode(tmp)["data"];
+        print("***내 리뷰 보기***");
+        print(value.body);
+        print(userReview);
+        isLoading_userReview = false;
+      });
+    })
+        .onError((error, stackTrace){
+      print(error);
+      print(stackTrace);
+    });
+  }
+
+  Future<void> updateUserName(String newUserName) async {
+    http.put(Uri.parse("https://socdoc.dev-lr.com/api/user/update/name"),
+        headers: {
+          "content-type": "application/json"
+        },
+        body: jsonEncode({
+          "userId": getUserID(),
+          "userName" : newUserName,
+        }));
+    print("**********닉네임변경**********");
+  }
+
   Widget build(BuildContext context) {
     SocdocAppState socdocApp = context.findAncestorStateOfType<SocdocAppState>()!;
 
@@ -17,7 +134,7 @@ class SettingPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            UserInfo("Dev.LR", "서울특별시 동작구", context),
+            UserInfo(userName, userAddress, context),
             SizedBox(height: 20.0),
             MyPageList("즐겨찾기 병원 목록", Icons.favorite_border),
             FavoriteHospital(),
@@ -33,6 +150,7 @@ class SettingPage extends StatelessWidget {
   }
 
   Widget UserInfo(String name, String address, BuildContext context) {
+    if(isLoading_userInfo) return circularProgress();
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(8.0),
@@ -55,31 +173,37 @@ class SettingPage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(name, style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold)),
+                    Text(name, style: TextStyle(
+                        fontSize: 30.0, fontWeight: FontWeight.bold)),
                     IconButton(
                       onPressed: () {
                         _nickNameDialog(context);
                       },
-                      icon: Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 20.0),
+                      icon: Icon(Icons.arrow_forward_ios_rounded,
+                          color: Colors.black, size: 20.0),
                     ),
                   ],
                 ),
                 SizedBox(height: 3.0),
                 Row(
                   children: [
-                    Icon(Icons.home_work_outlined, color: Colors.grey, size: 18.0),
+                    Icon(Icons.home_work_outlined, color: Colors.grey,
+                        size: 18.0),
                     SizedBox(width: 5.0),
-                    Text(address, style: TextStyle(fontSize: 15.0, color: Colors.grey)),
+                    Text(address,
+                        style: TextStyle(fontSize: 15.0, color: Colors.grey)),
                     IconButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SettingAddressPage(),
+                            builder: (context) => SettingAddressPage(onAddressUpdate: _updateUserInfo),
                           ),
                         );
                       },
-                      icon: Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 15.0),
+                      icon: Icon(
+                          Icons.arrow_forward_ios_rounded, color: Colors.grey,
+                          size: 15.0),
                     ),
                   ],
                 ),
@@ -92,6 +216,7 @@ class SettingPage extends StatelessWidget {
   }
 
   Future<void> _nickNameDialog(BuildContext context) async {
+    String newUserName = "";
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -102,7 +227,7 @@ class SettingPage extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 10.0),
             child: TextField(
               onChanged: (value) {
-                context = value as BuildContext;
+                newUserName = value;
               },
               decoration: InputDecoration(
                 hintText: '새로운 닉네임 입력',
@@ -123,8 +248,12 @@ class SettingPage extends StatelessWidget {
               child: Text('Cancel', style : TextStyle(fontSize: 17.0, color: AppColor.SocdocBlue)),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                await updateUserName(newUserName);
                 Navigator.of(context).pop();
+                setState(() {
+                  userName = newUserName;
+                });
               },
               child: Text('OK', style : TextStyle(fontSize: 17.0, color: AppColor.SocdocBlue)),
             ),
@@ -147,73 +276,96 @@ class SettingPage extends StatelessWidget {
     );
   }
 
-  Widget HospitalInfo(String name, String address, String img) {
-    return Container(
-      width: 200,
-      height: 160,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black26, width: 0.5),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(10.0),
-          topRight: Radius.circular(10.0),
+  Widget HospitalInfo(String name, String address, String img, String hospitalId) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(hpid: hospitalId),
+          ),
+        );
+      },
+      child: Container(
+        width: 200,
+        height: 160,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black26, width: 0.5),
+          borderRadius: BorderRadius.circular(10.0),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image(image: AssetImage(img), width: 200, height: 100, fit: BoxFit.cover),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, top: 8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue)),
-                  SizedBox(height: 5.0),
-                  Row(
-                    children: [
-                      Icon(Icons.location_on, size: 15),
-                      Text(address, style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black54)),
-                    ],
-                  ),
-                ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10.0),
+            topRight: Radius.circular(10.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image(image: AssetImage(img), width: 200, height: 100, fit: BoxFit.cover),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue)),
+                    SizedBox(height: 5.0),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, size: 15),
+                        Expanded(child: Text(address, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black54))),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget FavoriteHospital(){
+    if(isLoading_favoriteHospital) return circularProgress();
     return Container(
-      child: SingleChildScrollView(
+      height: 180,
+      child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            HospitalInfo("흑석성모안과의원", "동작구 상도로 36길", 'assets/hospital2.png'),
-            SizedBox(width: 35.0),
-            HospitalInfo("연세이비인후과", "동작구 상도로 17길", 'assets/hospital3.png'),
-            SizedBox(width: 35.0),
-            HospitalInfo("서울성모안과의원", "동작구 상도로 36길", 'assets/hospital2.png'),
-          ],
-        ),
+        itemCount: favoriteHospital.length,
+        itemBuilder: (context, index){
+          var hospital = favoriteHospital[index];
+          String hospitalName = hospital["name"];
+          String hospitalAddress = hospital["address"];
+          String hospitalId = hospital["hpid"];
+          return Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: HospitalInfo(hospitalName, hospitalAddress, 'assets/hospital2.png', hospitalId),
+          );
+        },
       ),
     );
   }
 
   Widget MyReviewList(){
+    if(isLoading_userReview) return circularProgress();
     return Container(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          myReview("흑석성모안과의원", "2023.09.01", "다 좋은데 줄이 너무 길어요..", "4.0", 'assets/hospital2.png'),
-          SizedBox(height: 10.0),
-          myReview("연세이비인후과", "2023.10.23", "간호사가 별로에요.", "3.0", 'assets/hospital3.png'),
-        ],
+      child: ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: userReview.length,
+        itemBuilder: (context, index){
+          var review = userReview[index];
+          String reviewContent = review["content"];
+          String reviewDate = review["createdAt"];
+          String reviewRate = review["rating"].toString();
+          String hospitalName = review["name"];
+          return Container(
+            height: 150,
+            child: myReview(hospitalName, reviewDate, reviewContent, reviewRate, 'assets/hospital2.png')
+          );
+        },
       ),
     );
   }
@@ -371,6 +523,32 @@ class SettingPage extends StatelessWidget {
       socdocApp.setState(() {
         socdocApp.isLoggedIn = false;
       });
+    }
+  }
+}
+
+class _LifecycleObserver extends WidgetsBindingObserver {
+  final AsyncCallback? resumeCallback;
+
+  _LifecycleObserver({
+    this.resumeCallback
+  });
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    switch(state) {
+      case AppLifecycleState.resumed:
+        if(resumeCallback != null){
+          await resumeCallback!();
+        }
+        break;
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+        break;
     }
   }
 }
