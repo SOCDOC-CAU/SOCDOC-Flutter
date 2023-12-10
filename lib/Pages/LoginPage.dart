@@ -88,7 +88,7 @@ class _LoginButtons extends StatelessWidget {
               Buttons.google,
               text: "Sign In with Google",
               onPressed: () {
-                tryLogin(0);
+                tryLogin(context, 0);
               }
             )
           ),
@@ -101,7 +101,7 @@ class _LoginButtons extends StatelessWidget {
               Buttons.apple,
               text: "Sign In with Apple",
               onPressed: () {
-                tryLogin(1);
+                tryLogin(context, 1);
               }
             )
           ),

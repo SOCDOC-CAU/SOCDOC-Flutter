@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
 
 import 'package:socdoc_flutter/Pages/LoginPage.dart';
 import 'package:socdoc_flutter/Pages/MainPage.dart';
+import 'package:socdoc_flutter/Utils/AuthProvider.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  runApp(const SocdocApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthProvider(),
+      child: const SocdocApp()
+    )
+  );
 }
 
 class SocdocApp extends StatefulWidget {

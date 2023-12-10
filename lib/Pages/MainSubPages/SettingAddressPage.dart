@@ -94,7 +94,7 @@ class _SettingAddressPageState extends State<SettingAddressPage> {
       body: jsonEncode({
         "address1": curAddress1,
         "address2": curAddress2,
-        "userId": getUserID()
+        "userId": getUserID(context)
       }));
   }
 

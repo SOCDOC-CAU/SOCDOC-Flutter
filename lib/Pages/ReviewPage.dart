@@ -54,7 +54,7 @@ class _ReviewPageState extends State<ReviewPage> {
     request.fields["content"] = inputReviewText;
     request.fields["hospitalId"] = widget.hospitalID;
     request.fields["rating"] = inputRating.toString();
-    request.fields["userId"] = getUserID();
+    request.fields["userId"] = getUserID(context);
     request.files.add(await http.MultipartFile.fromPath("files", inputPhoto!.path));
     request.send().then((res){
       if(res.statusCode == 200) {

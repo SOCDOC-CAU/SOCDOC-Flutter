@@ -264,7 +264,7 @@ class _DetailPageState extends State<DetailPage> {
       },
       body: jsonEncode({
         "hospitalId": widget.hpid,
-        "userId": getUserID()
+        "userId": getUserID(context)
       }));
   }
 
@@ -275,7 +275,7 @@ class _DetailPageState extends State<DetailPage> {
         },
         body: jsonEncode({
           "hospitalId": widget.hpid,
-          "userId": getUserID()
+          "userId": getUserID(context)
         }));
   }
 
@@ -286,13 +286,13 @@ class _DetailPageState extends State<DetailPage> {
           print("unlike");
           await unlikeHospital(
             widget.hpid,
-            getUserID(),
+            getUserID(context),
           );
         } else {
           print("like");
           await likeHospital(
             widget.hpid,
-            getUserID(),
+            getUserID(context),
           );
         }
 
@@ -317,7 +317,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> hospitalDetailInfo() async {
-    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/detail?hospitalId=${widget.hpid}&userId=${getUserID()}"))
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/detail?hospitalId=${widget.hpid}&userId=${getUserID(context)}"))
       .then((value){
         setState(() {
           var tmp = utf8.decode(value.bodyBytes);
