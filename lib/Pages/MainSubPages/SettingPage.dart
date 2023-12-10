@@ -19,14 +19,17 @@ class _SettingPageState extends State<SettingPage> {
   String userName = "";
   String userAddress = "";
   var favoriteHospital = null;
+  var userReview = null;
   bool isLoading_userInfo = true;
   bool isLoading_favoriteHospital = true;
+  bool isLoading_userReview = true;
 
   @override
   void initState() {
     super.initState();
     userInfo();
     favoriteHospitalInfo();
+    userReviewInfo();
   }
 
   Widget circularProgress(){
@@ -68,6 +71,24 @@ class _SettingPageState extends State<SettingPage> {
         print("********^^좋아요누른병원**");
         print(value.body);
         print(favoriteHospital);
+        isLoading_favoriteHospital = false;
+      });
+    })
+        .onError((error, stackTrace){
+      print(error);
+      print(stackTrace);
+    });
+  }
+
+  Future<void> userReviewInfo() async {
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/review/user?userId=${getUserID()}"))
+        .then((value){
+      setState(() {
+        var tmp = utf8.decode(value.bodyBytes);
+        userReview = jsonDecode(tmp)["data"];
+        print("********^^좋아요누른병원**");
+        print(value.body);
+        print(userReview);
         isLoading_favoriteHospital = false;
       });
     })
