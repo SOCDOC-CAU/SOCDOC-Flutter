@@ -23,6 +23,9 @@ String selectedHospitalKO = '전체';
 String curAddress1 = "서울시";
 String curAddress2 = "동작구";
 
+
+List<Widget> hospitalItemList = [];
+
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
@@ -324,6 +327,21 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
       );
     }
 
+    List<Widget> getHospitalCards() {
+
+      http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?address1=$curAddress1&address2=$curAddress2"
+          "&pageNum=1&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
+          .then((value){
+            var tmp = utf8.decode(value.bodyBytes);
+            jsonDecode(tmp)["data"].forEach((item){
+              hospitalItemList.add(HospitalCard(item["name"]));
+            });
+          }
+      );
+
+      return hospitalItemList;
+    }
+
     return Stack(
     children: [
     DraggableScrollableSheet(
@@ -373,12 +391,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                             ),
                             SizedBox(height: 15),
                             Column(
-                              children: [
-                                HospitalCard('서울연세이비인후과'),
-                                HospitalCard('서울연세이비인후과'),
-                                HospitalCard('서울연세이비인후과'),
-                                HospitalCard('서울연세이비인후과'),
-                              ],
+                              children: hospitalItemList
                             ),
                           ],
                         ),
