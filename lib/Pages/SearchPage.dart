@@ -321,7 +321,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                               padding: const EdgeInsets.only(top: 5.0),
                               child: Icon(Icons.star_rounded, color: Colors.amberAccent),
                             ),
-                            Text("5.0"),
+                            Text(rating),
                           ],
                         ),
                       ],
@@ -406,14 +406,14 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
         ),
         iconStyleData: IconStyleData(
           icon: Icon(
-            Icons.expand_more,
+            Icons.expand_more_rounded,
             color: AppColor.logo,
           ),
           iconSize: 26,
           iconEnabledColor: selectedValue1 != null ? AppColor.logo : AppColor.logo,
           iconDisabledColor: Colors.grey,
           openMenuIcon: Icon(
-              Icons.expand_less,
+              Icons.expand_less_rounded,
               color: AppColor.logo),
         ),
         dropdownStyleData: DropdownStyleData(
@@ -529,7 +529,7 @@ class CustomDropDownState extends State<CustomDropDown> {
                 ),
               ),
               Icon(
-                isButtonPressed ? Icons.expand_more : Icons.expand_less,
+                isButtonPressed ? Icons.expand_more_rounded : Icons.expand_less_rounded,
                 size: 26,
               ),
             ],
