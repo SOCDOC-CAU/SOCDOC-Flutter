@@ -55,8 +55,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
   Future<void> MainFamousHospitalInfo() async {
-    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?"
-        "address1=${address1}&address2=${address2}&pageNum=1&sortType=0"))
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/main?"
+        "address1=${address1}&address2=${address2}&code1=${HospitalTypes[selectedTileIndices[0]].id}&code2=${HospitalTypes[selectedTileIndices[1]].id}&code3=${HospitalTypes[selectedTileIndices[2]].id}&code4=${HospitalTypes[selectedTileIndices[3]].id}"))
         .then((value){
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
