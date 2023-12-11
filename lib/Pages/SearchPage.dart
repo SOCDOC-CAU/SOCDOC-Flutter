@@ -384,7 +384,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColor.logo,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -401,20 +401,20 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
               width: 1.0,
             ),
             borderRadius: BorderRadius.circular(20),
-            color: selectedValue1 != null ? AppColor.logo : Colors.white ,
+            color: Colors.white,
           ),
         ),
         iconStyleData: IconStyleData(
           icon: Icon(
             Icons.expand_more,
-            color: selectedValue1 != null ? Colors.white : AppColor.logo  ,
+            color: AppColor.logo,
           ),
           iconSize: 26,
-          iconEnabledColor: selectedValue1 != null ? Colors.white : AppColor.logo,
+          iconEnabledColor: selectedValue1 != null ? AppColor.logo : AppColor.logo,
           iconDisabledColor: Colors.grey,
           openMenuIcon: Icon(
               Icons.expand_less,
-              color: selectedValue1 != null ? Colors.white : AppColor.logo),
+              color: AppColor.logo),
         ),
         dropdownStyleData: DropdownStyleData(
           maxHeight: 100,
