@@ -62,7 +62,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<void> userInfo() async {
-    http.get(Uri.parse("https://socdoc.dev-lr.com/api/user?userId=${getUserID()}"))
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/user?userId=${getUserID(context)}"))
         .then((value){
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
@@ -78,7 +78,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<void> favoriteHospitalInfo() async {
-    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/like?userId=${getUserID()}"))
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/like?userId=${getUserID(context)}"))
         .then((value){
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
@@ -96,7 +96,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<void> userReviewInfo() async {
-    http.get(Uri.parse("https://socdoc.dev-lr.com/api/review/user?userId=${getUserID()}"))
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/review/user?userId=${getUserID(context)}"))
         .then((value){
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
@@ -119,7 +119,7 @@ class _SettingPageState extends State<SettingPage> {
           "content-type": "application/json"
         },
         body: jsonEncode({
-          "userId": getUserID(),
+          "userId": getUserID(context),
           "userName" : newUserName,
         }));
     print("**********닉네임변경**********");

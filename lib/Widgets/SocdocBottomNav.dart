@@ -21,15 +21,18 @@ class SocdocBottomNavState extends State<SocdocBottomNav> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Column(
-            children: [
-              IconButton(
-                onPressed: (){openSearch();},
-                icon: const Icon(Icons.search, size: 30.0)),
-              const Text('Search',
-                style: TextStyle(fontSize: 15.0),
-              )
-            ],
+          InkWell(
+            onTap: (){openSearch();},
+            child: Column(
+              children: [
+                IconButton(
+                  onPressed: (){openSearch();},
+                  icon: const Icon(Icons.search, size: 30.0)),
+                const Text('Search',
+                  style: TextStyle(fontSize: 15.0),
+                )
+              ],
+            ),
           ),
           IconButton(
             onPressed: (){updateIdx(1);},
@@ -37,15 +40,18 @@ class SocdocBottomNavState extends State<SocdocBottomNav> {
                 height: double.infinity,
                 fit: BoxFit.fill,
                 image: AssetImage('assets/socdoc_logo.png'))),
-          Column(
-            children: [
-              IconButton(
-                onPressed: (){updateIdx(2);},
-                icon: const Icon(Icons.person, size: 30.0)),
-              const Text('My Page',
-                style: TextStyle(fontSize: 15.0),
-              )
-            ],
+          InkWell(
+            onTap: (){updateIdx(2);},
+            child: Column(
+              children: [
+                IconButton(
+                  onPressed: (){updateIdx(2);},
+                  icon: const Icon(Icons.person, size: 30.0)),
+                const Text('My Page',
+                  style: TextStyle(fontSize: 15.0),
+                )
+              ],
+            ),
           ),
         ]
       ),

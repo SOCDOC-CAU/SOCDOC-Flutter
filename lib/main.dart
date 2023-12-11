@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
 
 import 'package:socdoc_flutter/Pages/LoginPage.dart';
 import 'package:socdoc_flutter/Pages/MainPage.dart';
+import 'package:socdoc_flutter/Utils/SocdocAuthProvider.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  runApp(const SocdocApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => SocdocAuthProvider(),
+      child: const SocdocApp()
+    )
+  );
 }
 
 class SocdocApp extends StatefulWidget {
@@ -27,7 +34,7 @@ class SocdocAppState extends State<SocdocApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true
       ),
-      home: isLoggedIn ? MainPage() : LoginPage(),
+      home: isLoggedIn ? const MainPage() : const LoginPage(),
     );
   }
 }

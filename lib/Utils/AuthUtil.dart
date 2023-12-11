@@ -1,13 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:socdoc_flutter/Utils/SocdocAuthProvider.dart';
 
-String getUserID() {
-  return FirebaseAuth.instance.currentUser!.uid;
+String getUserID(BuildContext context) {
+  print("UID" + context.read<SocdocAuthProvider>().userID);
+  return context.read<SocdocAuthProvider>().userID;
 }
 
-Future<String?> getUserToken() async {
-  return await FirebaseAuth.instance.currentUser!.getIdToken();
+Future<String?> getUserToken(BuildContext context) async {
+  return context.read<SocdocAuthProvider>().userToken;
 }
 
 Future<String?> tryAppleLogin() async {
@@ -30,11 +34,13 @@ Future<String?> tryGoogleLogin() async {
   return await FirebaseAuth.instance.currentUser!.getIdToken();
 }
 
-Future<void> tryLogin(var type) async {
+Future<void> tryLogin(context, var type) async {
   (type == 0 ? tryGoogleLogin() : tryAppleLogin()).then((userToken) => {
     http.post(Uri.parse("https://socdoc.dev-lr.com/api/user/login"),
       headers: {
         "authToken": userToken!
+      }).then((value){
+        context.read<SocdocAuthProvider>().updateUser();
       })
   });
 }

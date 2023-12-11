@@ -1,47 +1,44 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:label_marker/label_marker.dart';
 import 'package:socdoc_flutter/Pages/DetailPage.dart';
+
 import 'package:socdoc_flutter/style.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:socdoc_flutter/Utils/HospitalTypes.dart';
 
-late double _height=105;
-final double _lowLimit = 105;
-final double _highLimit = 710;
-final double _upThresh = 100;
-final double _boundary = 500;
-final double _downThresh = 550;
 bool isButtonPressed = false;
 bool isHospitalSelected = false;
+int pageIdx = 1;
+String? selectedValue1 = "0";
+String selectedHospitalID = "D000";
+String selectedHospitalKO = '전체';
+String curAddress1 = "서울특별시";
+String curAddress2 = "동작구";
+
+Set<Marker> mapMarkers = {};
+const List<String> SortingCriteria = ['별점순', '이름순'];
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            ElevatedButton(
-              child: const Text("Detail Page"),
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailPage(hpid: "A1100005")));
-              }
-            ),
-            Expanded(
-              child: Stack(
-                children:[
-                  MapView(),
-                 MapBottomSheet(),
-                ]
-
-              ),
-            )],
+        child: Expanded(
+          child: Stack(
+            children:[
+              MapView(),
+              MapBottomSheet(),
+            ]
+          ),
         )
       )
     );
@@ -64,14 +61,37 @@ class _MapViewState extends State<MapView> {
   );
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _determinePosition();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return GoogleMap(
       mapType: MapType.normal,
+      markers: mapMarkers,
       initialCameraPosition: initCoord,
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
+      },
+      onCameraIdle: () async {
+        GoogleMapController controller = await _controller.future;
+        var latlng = await controller.getVisibleRegion();
+        var lat = (latlng.northeast.latitude + latlng.southwest.latitude) / 2;
+        var lng = (latlng.northeast.longitude + latlng.southwest.longitude) / 2;
+
+        http.get(Uri.parse("https://dapi.kakao.com/v2/local/geo/coord2regioncode.JSON?x=$lng&y=$lat"),
+            headers: {
+              "Authorization": "KakaoAK ${dotenv.env['KAKAO_API_KEY']}"
+            }).then((res) {
+          var resJson = jsonDecode(res.body);
+
+          setState(() {
+            curAddress1 = resJson["documents"][0]["region_1depth_name"];
+            curAddress2 = resJson["documents"][0]["region_2depth_name"];
+          });
+        });
       }
     );
   }
@@ -114,276 +134,313 @@ class _MapViewState extends State<MapView> {
   }
 }
 
-
-class SharedData {
-  static String selectedHospitalKO = '';
-}
 class MapBottomSheet extends StatefulWidget {
   const MapBottomSheet({super.key});
 
   @override
   State<MapBottomSheet> createState() => _MapBottomSheetState();
 }
-class _MapBottomSheetState extends State<MapBottomSheet> {
 
-  final List<String> SortingCriteria = [
-    '별점순',
-    '이름순',
-  ];
-  String? selectedValue1;
+class _MapBottomSheetState extends State<MapBottomSheet> {
   IconData arrowIcon = Icons.expand_more;
   bool isDropdownOpened = false;
-  bool isSelected =  false;
-  String? selectedHospitalName; //여기다가 병원 진료과목 저장해두었습니다
   bool isHospitalSpecialtyPressed = false;
-  String selectedHospitalKO = SharedData.selectedHospitalKO;
+  bool isSelected =  false;
+  String? selectedHospitalName;
+
+  List<Widget> hospitalItemList = [];
+
   @override
   void initState() {
     super.initState();
-    _height = _lowLimit;
-    isButtonPressed = true;
+
+    isButtonPressed = false;
+    isHospitalSelected = false;
+    pageIdx = 1;
     selectedValue1 = SortingCriteria[0];
+    selectedHospitalID = "D000";
+    selectedHospitalKO = '전체';
+    curAddress1 = "서울특별시";
+    curAddress2 = "동작구";
+
+    getHospitalList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final edgeInsets = EdgeInsets.only(left: 16.0, top: 5.0);
-    final detailHospitalStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-    final titleHospital = TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo);
-
-    //병원 미리보기 카드
-    //-> 카드에서 주소
-    Widget HospitalAddress(String text) {
-      return Row(
-        children: [
-          Padding(padding: edgeInsets, child: Icon(Icons.location_on)),
-          Padding(padding: EdgeInsets.only(left: 10.0)),
-          Text(text, style: detailHospitalStyle),
-        ],
-      );
-    }
-    Widget HospitalCard(String text) {
-      return
-        SizedBox(
-          height: 265, width: double.infinity,
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            elevation: 10.0,
-            surfaceTintColor: Colors.transparent,
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
-                  child: Container(
-                    width: double.infinity,
-                    height: 150,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0), // 여기서 원하는 둥근 정도를 설정합니다.
-                      child:  Image(
-                        image: AssetImage('assets/images/hospital1.png'),
-                        fit: BoxFit.cover,
+    return Stack(
+      children: [
+        DraggableScrollableSheet(
+          initialChildSize: 0.14,
+          minChildSize: 0.14,
+          maxChildSize: 0.8,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return SingleChildScrollView(
+              controller: scrollController,
+              child: Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20)),
+                  color: Colors.white),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    Container(
+                      width: 70,
+                      height: 4.5,
+                      decoration: const BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(text, style: titleHospital),
-                      Column(
+                    Padding(
+                      padding: const EdgeInsets.only(left:25.0, right:25.0, top:20.0, bottom: 30.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top:5.0),
-                            child: Icon(Icons.star_rounded, color: Colors.amberAccent),
+                          Row(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(right:20.0),
+                                child: DropDownButton1(),
+                              ),
+                              CustomDropDown(updater: getHospitalList),
+                            ],
                           ),
-                          Text("5.0"),
+                          const SizedBox(height: 15),
+                          hospitalItemList.isNotEmpty
+                              ? Column(children: hospitalItemList)
+                              : Column(mainAxisSize: MainAxisSize.max, children: [circularProgress()],),
+                          const SizedBox(height: 15),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(108, 45),
+                              backgroundColor: AppColor.logo,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                side: const BorderSide(
+                                  color: AppColor.logo,
+                                  width: 1.0,
+                                ),
+                              ),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                            ),
+                            onPressed: (){
+                              pageIdx++;
+                              getHospitalList();
+                            },
+                            child: const Text("더보기"))
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                HospitalAddress("동작구 상도동 4길 36"),
-              ],
-            ),
-          ),
-        );
-    }
-    //병원 미리보기 카드 끝
-    Widget DropDownButton1() {
-      return DropdownButtonHideUnderline(
-        child: DropdownButton2<String>(
-          isExpanded: true,
-          items: SortingCriteria
-              .map((String item) => DropdownMenuItem<String>(
-            value: item,
-            child: Text(
-              item,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
               ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ))
-              .toList(),
-          value: selectedValue1,
-          onChanged: (value) {
-            setState(() {
-              selectedValue1 = value;
-            });
+            );
           },
-          selectedItemBuilder: (BuildContext context) {
-            return
-              SortingCriteria.map<Widget>((String item) {
-                return Container(
-                  child: Center(
-                    child: Text(
-                      item,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white, // 버튼에 표시되는 선택된 항목의 글자 색을 흰색으로 설정
-                      ),
-                      overflow: TextOverflow.ellipsis,
+        )
+      ],
+    );
+  }
+
+  void getHospitalList() {
+    setState(() {
+      hospitalItemList.clear();
+      http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list${selectedHospitalID != "D000" ? '/$selectedHospitalID' : ''}"
+          "?address1=$curAddress1&address2=$curAddress2"
+          "&pageNum=$pageIdx&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
+          .then((value){
+        var tmp = jsonDecode(utf8.decode(value.bodyBytes));
+        setState(() {
+          tmp["data"].forEach((item){
+            hospitalItemList.add(HospitalCard(item["name"], item["address"], item["hpid"]));
+            mapMarkers.addLabelMarker(LabelMarker(
+              label: item["name"],
+              markerId: MarkerId(item["name"]),
+              position: LatLng(item["latitude"], item["longitude"]),
+              backgroundColor: Colors.green,
+            ));
+          });
+        });
+      });
+    });
+  }
+
+  Widget HospitalCard(String name, String address, String hospitalID) {
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(hpid: hospitalID)));
+      },
+      child: SizedBox(
+        height: 265, width: double.infinity,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          elevation: 10.0,
+          surfaceTintColor: Colors.transparent,
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 150,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12.0),
+                    child:  const Image(
+                      image: AssetImage('assets/images/hospital1.png'),
+                      fit: BoxFit.cover,
                     ),
                   ),
-                );
-              }).toList();
-          },
-          //버튼 layout
-          buttonStyleData: ButtonStyleData(
-            height: 45,
-            width: 100,
-            padding: const EdgeInsets.only(left: 12, right: 6.0),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: AppColor.logo,
-                width: 1.0, // 테두리 너비 조절
+                ),
               ),
-              borderRadius: BorderRadius.circular(20),
-              color: selectedValue1 != null ? AppColor.logo : Colors.white ,
-            ),
-          ),
-
-          iconStyleData: IconStyleData(
-            icon: Icon(
-              Icons.expand_more,
-              color: selectedValue1 != null ? Colors.white : AppColor.logo  ,
-            ),
-            iconSize: 26,
-            iconEnabledColor: selectedValue1 != null ? Colors.white : AppColor.logo,
-            iconDisabledColor: Colors.grey,
-            openMenuIcon: Icon(
-                Icons.expand_less,
-                color: selectedValue1 != null ? Colors.white : AppColor.logo),
-          ),
-          dropdownStyleData: DropdownStyleData(
-            maxHeight: 100,
-            width: 100,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              color: Colors.white,
-            ),
-            scrollbarTheme: ScrollbarThemeData(
-              radius: const Radius.circular(40),
-              thickness: MaterialStateProperty.all(6),
-              thumbVisibility: MaterialStateProperty.all(true),
-            ),
-          ),
-          menuItemStyleData: const MenuItemStyleData(
-            height: 40,
-            padding: EdgeInsets.only(left: 14, right: 14),
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(name,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
+                    const Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top:5.0),
+                          child: Icon(Icons.star_rounded, color: Colors.amberAccent),
+                        ),
+                        Text("5.0"),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  const Padding(padding: EdgeInsets.only(left: 16.0, top: 5.0), child: Icon(Icons.location_on)),
+                  const Padding(padding: EdgeInsets.only(left: 10.0)),
+                  Text(address,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
+                ],
+              )
+            ],
           ),
         ),
-      );
-    }
-
-    return Stack(
-    children: [
-        Container(
-            color: Colors.white,
-            child: Text("지도"),
-    ),
-    DraggableScrollableSheet(
-    // 화면 비율로 높이 조정
-        initialChildSize: 0.14,
-        minChildSize: 0.14,
-        maxChildSize: 0.8,
-        builder: (BuildContext context, ScrollController scrollController) {
-    return SingleChildScrollView(
-        controller: scrollController,
-        child: Container(
-           height: 1500,
-           decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-
-                topRight: Radius.circular(20)),
-                color: Colors.white,
-           ),
-                child:  SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Container(
-                        width: 70,
-                        height: 4.5,
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left:25.0, right:25.0, top:20.0 ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.only(right:20.0),
-                                  child: DropDownButton1(),
-                                ),
-                                CustomDropDown(),
-                              ],
-                            ),
-                            SizedBox(height: 15),
-                            Column(
-                              children: [
-                                HospitalCard('서울연세이비인후과'),
-                                HospitalCard('서울연세이비인후과'),
-                                HospitalCard('서울연세이비인후과'),
-                                HospitalCard('서울연세이비인후과'),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
       ),
-      ),
-    ),);
-    },
-    )
-    ],
     );
+  }
 
+  Widget DropDownButton1() {
+    return DropdownButtonHideUnderline(
+      child: DropdownButton2<String>(
+        isExpanded: true,
+        items: SortingCriteria
+            .map((String item) => DropdownMenuItem<String>(
+          value: item,
+          child: Text(
+            item,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        )).toList(),
+        value: selectedValue1,
+        onChanged: (value) {
+          setState(() {
+            pageIdx = 1;
+            selectedValue1 = value;
+            getHospitalList();
+          });
+        },
+        selectedItemBuilder: (BuildContext context) {
+          return SortingCriteria.map<Widget>((String item) {
+            return Center(
+              child: Text(
+                item,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList();
+        },
+        buttonStyleData: ButtonStyleData(
+          height: 45,
+          width: 100,
+          padding: const EdgeInsets.only(left: 12, right: 6.0),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: AppColor.logo,
+              width: 1.0,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            color: selectedValue1 != null ? AppColor.logo : Colors.white ,
+          ),
+        ),
+        iconStyleData: IconStyleData(
+          icon: Icon(
+            Icons.expand_more,
+            color: selectedValue1 != null ? Colors.white : AppColor.logo  ,
+          ),
+          iconSize: 26,
+          iconEnabledColor: selectedValue1 != null ? Colors.white : AppColor.logo,
+          iconDisabledColor: Colors.grey,
+          openMenuIcon: Icon(
+              Icons.expand_less,
+              color: selectedValue1 != null ? Colors.white : AppColor.logo),
+        ),
+        dropdownStyleData: DropdownStyleData(
+          maxHeight: 100,
+          width: 100,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: Colors.white,
+          ),
+          scrollbarTheme: ScrollbarThemeData(
+            radius: const Radius.circular(40),
+            thickness: MaterialStateProperty.all(6),
+            thumbVisibility: MaterialStateProperty.all(true),
+          ),
+        ),
+        menuItemStyleData: const MenuItemStyleData(
+          height: 40,
+          padding: EdgeInsets.only(left: 14, right: 14),
+        ),
+      ),
+    );
+  }
 
+  Widget circularProgress(){
+    return Center(
+      child: Container(
+          alignment: Alignment.center,
+          color: Colors.white,
+          child: const SizedBox(
+              width: 50,
+              height: 50,
+              child: CircularProgressIndicator()
+          )
+      ),
+    );
   }
 }
+
 class CustomDropDown extends StatefulWidget {
   const CustomDropDown({
     super.key,
+    required this.updater
   });
+
+  final Function updater;
 
   @override
   State<StatefulWidget> createState() => CustomDropDownState();
@@ -392,9 +449,8 @@ class CustomDropDownState extends State<CustomDropDown> {
 
   final _link = LayerLink();
   double? _buttonWidth;
-  // String selectedHospitalKO = ''; // 추가: 선택된 병원 이름
   final OverlayPortalController _tooltipController = OverlayPortalController();
-  String selectedHospitalKO = SharedData.selectedHospitalKO;
+
   @override
   Widget build(BuildContext context) {
 
@@ -406,16 +462,18 @@ class CustomDropDownState extends State<CustomDropDown> {
           return CompositedTransformFollower(
             link: _link,
             targetAnchor: Alignment.bottomLeft,
-            offset: Offset(-145.0, 0),
+            offset: const Offset(-145.0, 0),
             child: Align(
               alignment: AlignmentDirectional.topCenter,
               child: MenuWidget(
                 width: _buttonWidth,
                 onItemSelected: (selectedItem) {
                   setState(() {
+                    pageIdx = 1;
                     selectedHospitalKO = selectedItem;
                     _tooltipController.toggle();
                     isButtonPressed = true;
+                    widget.updater();
                   });
                 },
               ),
@@ -425,19 +483,17 @@ class CustomDropDownState extends State<CustomDropDown> {
         child: ElevatedButton(
           onPressed: () {
             setState(() {
-              _height = _highLimit;
               _tooltipController.toggle();
               isButtonPressed = !isButtonPressed;
             });
-
           },
           style: ElevatedButton.styleFrom(
-            minimumSize: Size(108, 45),
+            minimumSize: const Size(108, 45),
             padding: const EdgeInsets.only(left: 16, right: 6),
             backgroundColor: AppColor.logo,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
-              side: BorderSide(
+              side: const BorderSide(
                 color: AppColor.logo,
                 width: 1.0,
               ),
@@ -449,7 +505,7 @@ class CustomDropDownState extends State<CustomDropDown> {
             children: [
               Text(
                 selectedHospitalKO.isEmpty ? '전체' : selectedHospitalKO,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -481,18 +537,15 @@ class MenuWidget extends StatefulWidget {
 }
 
 class _MenuWidgetState extends State<MenuWidget> {
-
-  String selectedHospitalKO = SharedData.selectedHospitalKO;
-
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 610.0,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Container(
           width: double.infinity,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(
               Radius.circular(25),
@@ -543,13 +596,13 @@ class _MenuWidgetState extends State<MenuWidget> {
                       tileColor: Colors.white,
                       onTap: () {
                         setState(() {
+                          selectedHospitalID = hospitalItem.id;
                           selectedHospitalKO = hospitalItem.ko;
-                          widget.onItemSelected?.call(selectedHospitalKO); // 추가: 선택된 아이템 전달
+                          widget.onItemSelected?.call(selectedHospitalKO);
                           isHospitalSelected = true;
-                          print(selectedHospitalKO);
                         });
                       },
-                      leading: Container(
+                      leading: SizedBox(
                         width: 45,
                         height: 45,
                         child: Image.asset(
@@ -573,7 +626,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                   ),
                 );
               },
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 3,
               ),

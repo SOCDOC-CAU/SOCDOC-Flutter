@@ -3,10 +3,12 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 import 'package:socdoc_flutter/Pages/OnBoardingPage.dart';
 
 import 'package:socdoc_flutter/Utils/AuthUtil.dart';
+import 'package:socdoc_flutter/Utils/SocdocAuthProvider.dart';
 
 import 'package:socdoc_flutter/firebase_options.dart';
 import 'package:socdoc_flutter/main.dart';
@@ -60,6 +62,7 @@ class _LoginPageState extends State<LoginPage> {
       .listen((User? user) async {
         if(user != null && socdocApp != null){
           socdocApp!.setState(() {
+            context.read<SocdocAuthProvider>().updateUser();
             socdocApp!.isLoggedIn = true;
           });
         }else if(mounted){
@@ -88,7 +91,7 @@ class _LoginButtons extends StatelessWidget {
               Buttons.google,
               text: "Sign In with Google",
               onPressed: () {
-                tryLogin(0);
+                tryLogin(context, 0);
               }
             )
           ),
@@ -101,7 +104,7 @@ class _LoginButtons extends StatelessWidget {
               Buttons.apple,
               text: "Sign In with Apple",
               onPressed: () {
-                tryLogin(1);
+                tryLogin(context, 1);
               }
             )
           ),
