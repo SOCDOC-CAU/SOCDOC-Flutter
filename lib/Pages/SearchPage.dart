@@ -33,13 +33,11 @@ class SearchPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: SafeArea(
-        child: Expanded(
-          child: Stack(
-            children:[
-              MapView(),
-              MapBottomSheet(),
-            ]
-          ),
+        child: Stack(
+          children:[
+            MapView(),
+            MapBottomSheet(),
+          ]
         )
       )
     );
