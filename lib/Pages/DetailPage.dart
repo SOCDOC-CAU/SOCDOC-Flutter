@@ -325,6 +325,10 @@ class _DetailPageState extends State<DetailPage> {
     pharmacyInfo();
   }
 
+  void _updateReviewInfo() {
+    reviewInfo();
+  }
+
   Future<void> hospitalDetailInfo() async {
     http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/detail?hospitalId=${widget.hpid}&userId=${getUserID(context)}"))
       .then((value){
@@ -436,7 +440,7 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                         floatingActionButton: FloatingActionButton(
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ReviewPage(hospitalID: hpId, hospitalName: hpName)));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ReviewPage(hospitalID: hpId, hospitalName: hpName, onReviewUpdate: _updateReviewInfo)));
                           },
                           backgroundColor: Colors.white,
                           child: const Icon(
