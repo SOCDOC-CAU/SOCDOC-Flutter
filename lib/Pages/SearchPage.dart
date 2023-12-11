@@ -255,6 +255,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
           "&pageNum=$pageIdx&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
           .then((value){
         var tmp = jsonDecode(utf8.decode(value.bodyBytes));
+        idx=100;
         setState(() {
           tmp["data"].forEach((item){
             hospitalItemList.add(HospitalCard(item["name"], item["address"], item["hpid"], item["rating"]!.toString(), idx));
