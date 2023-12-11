@@ -340,7 +340,7 @@ class _SettingPageState extends State<SettingPage> {
           String hospitalId = hospital["hpid"];
           return Padding(
             padding: const EdgeInsets.all(10.0),
-            child: HospitalInfo(hospitalName, hospitalAddress, 'assets/hospital2.png', hospitalId),
+            child: HospitalInfo(hospitalName, hospitalAddress, 'assets/images/hospital${index}.png', hospitalId),
           );
         },
       ),
@@ -363,7 +363,7 @@ class _SettingPageState extends State<SettingPage> {
           String hospitalName = review["name"];
           return Container(
             height: 150,
-            child: myReview(hospitalName, reviewDate, reviewContent, reviewRate, 'assets/hospital2.png')
+            child: myReview(hospitalName, reviewDate, reviewContent, reviewRate, 'assets/images/hospital${index}.png')
           );
         },
       ),
