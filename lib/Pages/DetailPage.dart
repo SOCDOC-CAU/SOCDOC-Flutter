@@ -10,9 +10,10 @@ import "package:http/http.dart" as http;
 
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({required this.hpid, Key? key}) : super(key: key);
+  const DetailPage({required this.hpid, required this.hpidx, Key? key}) : super(key: key);
 
   final String hpid;
+  final int hpidx;
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -359,8 +360,8 @@ class _DetailPageState extends State<DetailPage> {
                 Container(
                   width: 400,
                   height: 200,
-                  child: const Image(
-                    image: AssetImage('assets/hospital3.png'),
+                  child: Image(
+                    image: AssetImage('assets/images/hospital${widget.hpidx}.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
