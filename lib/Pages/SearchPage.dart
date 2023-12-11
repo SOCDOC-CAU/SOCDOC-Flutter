@@ -305,12 +305,18 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(name, overflow: TextOverflow.ellipsis, maxLines: 1,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
-                    const Column(
+                    Expanded(
+                      child: Text(
+                        name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo),
+                      ),
+                    ),
+                    Column(
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(top:5.0),
+                          padding: const EdgeInsets.only(top: 5.0),
                           child: Icon(Icons.star_rounded, color: Colors.amberAccent),
                         ),
                         Text("5.0"),
