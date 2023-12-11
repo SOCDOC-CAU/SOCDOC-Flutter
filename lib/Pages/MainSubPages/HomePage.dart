@@ -154,11 +154,11 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           children: [
             Icon(
-              Icons.location_on,
+              Icons.maps_home_work_rounded,
               color : Colors.white,
-              size : 35.0,
+              size : 32.0,
             ),
-            SizedBox(width: 10.0),
+            SizedBox(width: 15.0),
             Text(address1 + " " + address2,
               style: TextStyle(
                   color: Colors.white,
