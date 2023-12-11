@@ -366,7 +366,7 @@ class _SettingPageState extends State<SettingPage> {
           String hospitalName = review["name"];
           return Container(
             height: 150,
-            child: myReview(hospitalName, reviewDate, reviewContent, reviewRate, 'assets/images/hospital${idx}.png')
+            child: myReview(hospitalName, reviewDate, reviewContent, reviewRate, 'assets/images/hospital${idx+99}.png')
           );
         },
       ),
