@@ -256,7 +256,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
         var tmp = jsonDecode(utf8.decode(value.bodyBytes));
         setState(() {
           tmp["data"].forEach((item){
-            hospitalItemList.add(HospitalCard(item["name"], item["address"], item["hpid"]));
+            hospitalItemList.add(HospitalCard(item["name"], item["address"], item["hpid"], item["rating"]!.toString()));
             mapMarkers.addLabelMarker(LabelMarker(
               label: item["name"],
               markerId: MarkerId(item["name"]),
@@ -269,7 +269,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
     });
   }
 
-  Widget HospitalCard(String name, String address, String hospitalID) {
+  Widget HospitalCard(String name, String address, String hospitalID, String rating) {
     return InkWell(
       onTap: (){
         Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(hpid: hospitalID)));
@@ -305,7 +305,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(name,
+                    Text(name, overflow: TextOverflow.ellipsis, maxLines: 1,
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
                     const Column(
                       children: [
@@ -323,10 +323,17 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                 children: [
                   const Padding(padding: EdgeInsets.only(left: 16.0, top: 5.0), child: Icon(Icons.location_on)),
                   const Padding(padding: EdgeInsets.only(left: 10.0)),
-                  Text(address,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
+                  Expanded(
+                    child: Text(
+                      address,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
+                    ),
+                  ),
                 ],
               )
+
             ],
           ),
         ),
