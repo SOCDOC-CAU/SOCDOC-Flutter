@@ -51,7 +51,8 @@ class _DetailPageState extends State<DetailPage> {
       children: [
         Padding(padding: edgeInsets, child: Icon(icon, size: 23,)),
         const Padding(padding: EdgeInsets.only(left: 10.0, top: 5.0)),
-        Text(text, style: detailTextStyle),
+        if(dropdownItems == null)
+          Expanded(child: Text(text, overflow: TextOverflow.ellipsis, maxLines:1, style: detailTextStyle)),
         if (dropdownItems != null)
           DropdownButton<String>(
             value: dropdownItems[0],
