@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
 
     );
   }
-  //우리 동네 병원 한 눈에 보기
+  //네 병원 한 눈에 보기
   Widget NearbyHospital(){
     return Column(
       children: [
@@ -226,7 +226,7 @@ class _HomePageState extends State<HomePage> {
                 Icons.
                 settings,
                 color : Colors.black,
-                size : 30.0,
+                size : 25.0,
               ),
             ),
           ],
@@ -268,7 +268,7 @@ class _HomePageState extends State<HomePage> {
     return
       Row(
       children: [
-        Padding(padding: edgeInsets, child: Icon(Icons.location_on)),
+        Padding(padding: edgeInsets, child: Icon(Icons.location_on, size: 20)),
         Padding(padding: EdgeInsets.only(left: 10.0, top:10.0)),
         Container(
           width: 270.0, // 원하는 가로 길이 설정
