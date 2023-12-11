@@ -68,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
         }else if(mounted){
           setState(() {
             _isLoginNeeded = true;
-            Navigator.push(context, MaterialPageRoute(builder: (context) => OnBoardingPage()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const OnBoardingPage()));
           });
         }
       });
@@ -89,7 +89,7 @@ class _LoginButtons extends StatelessWidget {
             width: double.infinity,
             child: SignInButton(
               Buttons.google,
-              text: "Sign In with Google",
+              text: "   Sign In with Google",
               onPressed: () {
                 tryLogin(context, 0);
               }
@@ -102,7 +102,7 @@ class _LoginButtons extends StatelessWidget {
             width: double.infinity,
             child: SignInButton(
               Buttons.apple,
-              text: "Sign In with Apple",
+              text: "   Sign In with Apple",
               onPressed: () {
                 tryLogin(context, 1);
               }
