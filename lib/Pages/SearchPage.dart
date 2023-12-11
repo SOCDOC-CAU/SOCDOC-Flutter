@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:label_marker/label_marker.dart';
 import 'package:socdoc_flutter/Pages/DetailPage.dart';
+import 'package:socdoc_flutter/Utils/Color.dart' as SocdocAppColor;
 
 import 'package:socdoc_flutter/style.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -260,7 +261,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
               label: item["name"],
               markerId: MarkerId(item["name"]),
               position: LatLng(item["latitude"], item["longitude"]),
-              backgroundColor: Colors.green,
+              backgroundColor: SocdocAppColor.AppColor.SocdocBlue,
             ));
           });
         });
