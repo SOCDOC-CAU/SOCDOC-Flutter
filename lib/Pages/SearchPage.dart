@@ -216,7 +216,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                           const SizedBox(height: 15),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(108, 45),
+                              minimumSize: const Size(80, 45),
                               backgroundColor: AppColor.logo,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
@@ -274,75 +274,79 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
       onTap: (){
         Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(hpid: hospitalID)));
       },
-      child: SizedBox(
-        height: 265, width: double.infinity,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          elevation: 10.0,
-          surfaceTintColor: Colors.transparent,
-          color: Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 150,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12.0),
-                    child:  const Image(
-                      image: AssetImage('assets/images/hospital1.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 265, width: double.infinity,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        name,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: AppColor.logo),
+              elevation: 10.0,
+              surfaceTintColor: Colors.transparent,
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 150,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: const Image(
+                          image: AssetImage('assets/images/hospital1.png'),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                    Column(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: Icon(Icons.star_rounded, color: Colors.amberAccent),
+                        Expanded(
+                          child: Text(
+                            name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: AppColor.logo),
+                          ),
                         ),
-                        Text("5.0"),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5.0),
+                              child: Icon(Icons.star_rounded, color: Colors.amberAccent),
+                            ),
+                            Text("5.0"),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              Row(
-                children: [
-                  const Padding(padding: EdgeInsets.only(left: 16.0, top: 5.0), child: Icon(Icons.location_on)),
-                  const Padding(padding: EdgeInsets.only(left: 10.0)),
-                  Expanded(
-                    child: Text(
-                      address,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
-                    ),
                   ),
+                  Row(
+                    children: [
+                      const Padding(padding: EdgeInsets.only(left: 16.0, top: 5.0), child: Icon(Icons.location_on)),
+                      const Padding(padding: EdgeInsets.only(left: 10.0)),
+                      Expanded(
+                        child: Text(
+                          address,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
-              )
-
-            ],
+              ),
+            ),
           ),
-        ),
+          SizedBox(height: 20),
+        ],
       ),
     );
   }
