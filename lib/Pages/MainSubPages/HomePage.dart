@@ -81,6 +81,7 @@ class _HomePageState extends State<HomePage> {
 
               itemCount: FamousHospitalData.length,
               itemBuilder: (context, index) {
+                int idx = index+1;
                 var hospital =  FamousHospitalData[index];
                 String hospitalName = hospital["name"];
                 String hospitalAddress = hospital["address"];
@@ -89,7 +90,7 @@ class _HomePageState extends State<HomePage> {
 
                 print(hospitalAddress);
                 print(hospitalRating);
-                return HospitalCard(hospitalName, hospitalAddress,hospitalRating, hospitalId);
+                return HospitalCard(hospitalName, hospitalAddress,hospitalRating, hospitalId, idx);
               },
             ),
         );
@@ -282,7 +283,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
   //카드
-  Widget HospitalCard(String text, String address, String rating, String hpId) {
+  Widget HospitalCard(String text, String address, String rating, String hpId, int idx) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -314,7 +315,7 @@ class _HomePageState extends State<HomePage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12.0),
                       child:  Image(
-                        image: AssetImage('assets/images/hospital1.png'),
+                        image: AssetImage('assets/images/hospital${idx}.png'),
                         fit: BoxFit.cover,
                       ),
                     ),
