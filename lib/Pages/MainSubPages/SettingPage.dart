@@ -25,6 +25,7 @@ class _SettingPageState extends State<SettingPage> {
   bool isLoading_userInfo = true;
   bool isLoading_favoriteHospital = true;
   bool isLoading_userReview = true;
+  int idx = 1;
 
   void _updateUserInfo() {
     userInfo();
@@ -282,7 +283,7 @@ class _SettingPageState extends State<SettingPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailPage(hpid: hospitalId),
+            builder: (context) => DetailPage(hpid: hospitalId, hpidx: idx),
           ),
         );
       },
@@ -328,19 +329,26 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget FavoriteHospital(){
     if(isLoading_favoriteHospital) return circularProgress();
+    if(favoriteHospital.length == 0) return Container(
+      height: 100,
+      child: Center(
+        child: const Text("즐겨찾기 병원이 없습니다.", style: TextStyle(fontSize: 15.0, color: Colors.grey)),
+      ),
+    );
     return Container(
       height: 180,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: favoriteHospital.length,
         itemBuilder: (context, index){
+          int idx = index+1;
           var hospital = favoriteHospital[index];
           String hospitalName = hospital["name"];
           String hospitalAddress = hospital["address"];
           String hospitalId = hospital["hpid"];
           return Padding(
             padding: const EdgeInsets.all(10.0),
-            child: HospitalInfo(hospitalName, hospitalAddress, 'assets/hospital2.png', hospitalId),
+            child: HospitalInfo(hospitalName, hospitalAddress, 'assets/images/hospital${idx}.png', hospitalId),
           );
         },
       ),
@@ -349,6 +357,12 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget MyReviewList(){
     if(isLoading_userReview) return circularProgress();
+    if(userReview.length == 0) return Container(
+      height: 100,
+      child: Center(
+        child: const Text("아직 리뷰가 없습니다.", style: TextStyle(fontSize: 15.0, color: Colors.grey)),
+      ),
+    );
     return Container(
       padding: const EdgeInsets.all(8.0),
       child: ListView.builder(
@@ -356,6 +370,7 @@ class _SettingPageState extends State<SettingPage> {
         shrinkWrap: true,
         itemCount: userReview.length,
         itemBuilder: (context, index){
+          int idx = index+1;
           var review = userReview[index];
           String reviewContent = review["content"];
           String reviewDate = review["createdAt"];
@@ -363,7 +378,7 @@ class _SettingPageState extends State<SettingPage> {
           String hospitalName = review["name"];
           return Container(
             height: 150,
-            child: myReview(hospitalName, reviewDate, reviewContent, reviewRate, 'assets/hospital2.png')
+            child: myReview(hospitalName, reviewDate, reviewContent, reviewRate, 'assets/images/hospital${idx+99}.png')
           );
         },
       ),

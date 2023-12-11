@@ -7,7 +7,9 @@ import 'package:socdoc_flutter/Utils/AuthUtil.dart';
 import 'package:socdoc_flutter/Utils/Color.dart';
 
 class ReviewPage extends StatefulWidget {
-  const ReviewPage({super.key, required this.hospitalID, required this.hospitalName});
+  final Function()? onReviewUpdate;
+
+  const ReviewPage({super.key, required this.hospitalID, required this.hospitalName, required this.onReviewUpdate});
 
   final String hospitalID;
   final String hospitalName;
@@ -58,6 +60,7 @@ class _ReviewPageState extends State<ReviewPage> {
     request.files.add(await http.MultipartFile.fromPath("files", inputPhoto!.path));
     request.send().then((res){
       if(res.statusCode == 200) {
+        widget.onReviewUpdate?.call();
         Navigator.pop(context);
       }
     }).onError((error, stackTrace){

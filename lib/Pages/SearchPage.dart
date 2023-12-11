@@ -148,6 +148,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   bool isHospitalSpecialtyPressed = false;
   bool isSelected =  false;
   String? selectedHospitalName;
+  int idx = 100;
 
   List<Widget> hospitalItemList = [];
 
@@ -216,7 +217,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                           const SizedBox(height: 15),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(108, 45),
+                              minimumSize: const Size(80, 45),
                               backgroundColor: AppColor.logo,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
@@ -254,9 +255,11 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
           "&pageNum=$pageIdx&sortType=${selectedValue1 == "별점순" ? 0 : 1}"))
           .then((value){
         var tmp = jsonDecode(utf8.decode(value.bodyBytes));
+        idx=100;
         setState(() {
           tmp["data"].forEach((item){
-            hospitalItemList.add(HospitalCard(item["name"], item["address"], item["hpid"]));
+            hospitalItemList.add(HospitalCard(item["name"], item["address"], item["hpid"], item["rating"]!.toString(), idx));
+            idx++;
             mapMarkers.addLabelMarker(LabelMarker(
               label: item["name"],
               markerId: MarkerId(item["name"]),
@@ -269,67 +272,84 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
     });
   }
 
-  Widget HospitalCard(String name, String address, String hospitalID) {
+  Widget HospitalCard(String name, String address, String hospitalID, String rating, int idx) {
     return InkWell(
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(hpid: hospitalID)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(hpid: hospitalID, hpidx: idx)));
       },
-      child: SizedBox(
-        height: 265, width: double.infinity,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          elevation: 10.0,
-          surfaceTintColor: Colors.transparent,
-          color: Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 150,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12.0),
-                    child:  const Image(
-                      image: AssetImage('assets/images/hospital1.png'),
-                      fit: BoxFit.cover,
+      child: Column(
+        children: [
+          SizedBox(
+            height: 265, width: double.infinity,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              elevation: 10.0,
+              surfaceTintColor: Colors.transparent,
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 150,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: Image(
+                          image: AssetImage('assets/images/hospital${idx}.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
-                    const Column(
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(top:5.0),
-                          child: Icon(Icons.star_rounded, color: Colors.amberAccent),
+                        Expanded(
+                          child: Text(
+                            name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: AppColor.logo),
+                          ),
                         ),
-                        Text("5.0"),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5.0),
+                              child: Icon(Icons.star_rounded, color: Colors.amberAccent),
+                            ),
+                            Text(rating),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              Row(
-                children: [
-                  const Padding(padding: EdgeInsets.only(left: 16.0, top: 5.0), child: Icon(Icons.location_on)),
-                  const Padding(padding: EdgeInsets.only(left: 10.0)),
-                  Text(address,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo)),
+                  ),
+                  Row(
+                    children: [
+                      const Padding(padding: EdgeInsets.only(left: 16.0, top: 5.0), child: Icon(Icons.location_on)),
+                      const Padding(padding: EdgeInsets.only(left: 10.0)),
+                      Expanded(
+                        child: Text(
+                          address,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
-              )
-            ],
+              ),
+            ),
           ),
-        ),
+          SizedBox(height: 20),
+        ],
       ),
     );
   }
@@ -367,7 +387,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColor.logo,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -384,20 +404,20 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
               width: 1.0,
             ),
             borderRadius: BorderRadius.circular(20),
-            color: selectedValue1 != null ? AppColor.logo : Colors.white ,
+            color: Colors.white,
           ),
         ),
         iconStyleData: IconStyleData(
           icon: Icon(
-            Icons.expand_more,
-            color: selectedValue1 != null ? Colors.white : AppColor.logo  ,
+            Icons.expand_more_rounded,
+            color: AppColor.logo,
           ),
           iconSize: 26,
-          iconEnabledColor: selectedValue1 != null ? Colors.white : AppColor.logo,
+          iconEnabledColor: selectedValue1 != null ? AppColor.logo : AppColor.logo,
           iconDisabledColor: Colors.grey,
           openMenuIcon: Icon(
-              Icons.expand_less,
-              color: selectedValue1 != null ? Colors.white : AppColor.logo),
+              Icons.expand_less_rounded,
+              color: AppColor.logo),
         ),
         dropdownStyleData: DropdownStyleData(
           maxHeight: 100,
@@ -491,7 +511,7 @@ class CustomDropDownState extends State<CustomDropDown> {
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(108, 45),
             padding: const EdgeInsets.only(left: 16, right: 6),
-            backgroundColor: AppColor.logo,
+            backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
               side: const BorderSide(
@@ -499,7 +519,7 @@ class CustomDropDownState extends State<CustomDropDown> {
                 width: 1.0,
               ),
             ),
-            foregroundColor: Colors.white,
+            foregroundColor: AppColor.logo,
             elevation: 0,
           ),
           child: Row(
@@ -512,7 +532,7 @@ class CustomDropDownState extends State<CustomDropDown> {
                 ),
               ),
               Icon(
-                isButtonPressed ? Icons.expand_more : Icons.expand_less,
+                isButtonPressed ? Icons.expand_less_rounded : Icons.expand_more_rounded,
                 size: 26,
               ),
             ],

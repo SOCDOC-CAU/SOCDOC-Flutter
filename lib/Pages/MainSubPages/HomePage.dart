@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:socdoc_flutter/Pages/DetailPage.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -22,9 +23,9 @@ class _HomePageState extends State<HomePage> {
   var FamousHospitalData;
   var UserLocationData;
   final edgeInsets = EdgeInsets.only(left: 16.0, top: 5.0);
-  final detailHospitalStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  final titleHospital = TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue);
-  final pagetitle = TextStyle(color: Colors.black, fontSize: 20.0, fontWeight: FontWeight.bold);
+  final detailHospitalStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.normal);
+  final titleHospital = TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue);
+  final pagetitle = TextStyle(color: Colors.black, fontSize: 21.0, fontWeight: FontWeight.bold);
   String address1='';
   String address2='';
   Widget circularProgress(){
@@ -54,8 +55,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
   Future<void> MainFamousHospitalInfo() async {
-    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/list?"
-        "address1=${address1}&address2=${address2}&pageNum=1&sortType=0"))
+    http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/main?"
+        "address1=${address1}&address2=${address2}&code1=${HospitalTypes[selectedTileIndices[0]].id}&code2=${HospitalTypes[selectedTileIndices[1]].id}&code3=${HospitalTypes[selectedTileIndices[2]].id}&code4=${HospitalTypes[selectedTileIndices[3]].id}"))
         .then((value){
       setState(() {
         var tmp = utf8.decode(value.bodyBytes);
@@ -80,15 +81,16 @@ class _HomePageState extends State<HomePage> {
 
               itemCount: FamousHospitalData.length,
               itemBuilder: (context, index) {
+                int idx = index+1;
                 var hospital =  FamousHospitalData[index];
                 String hospitalName = hospital["name"];
                 String hospitalAddress = hospital["address"];
                 String hospitalRating = hospital["rating"].toString();
+                String hospitalId = hospital["hpid"].toString();
 
-                print("1sdfds"+hospitalName);
                 print(hospitalAddress);
                 print(hospitalRating);
-                return HospitalCard(hospitalName, hospitalAddress,hospitalRating);
+                return HospitalCard(hospitalName, hospitalAddress,hospitalRating, hospitalId, idx);
               },
             ),
         );
@@ -153,12 +155,12 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           children: [
             Icon(
-              Icons.location_on,
+              Icons.maps_home_work_rounded,
               color : Colors.white,
-              size : 35.0,
+              size : 32.0,
             ),
-            SizedBox(width: 10.0),
-            Text('서울시 동작구',
+            SizedBox(width: 15.0),
+            Text(address1 + " " + address2,
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 21.0,
@@ -208,7 +210,7 @@ class _HomePageState extends State<HomePage> {
 
     );
   }
-  //우리 동네 병원 한 눈에 보기
+  //네 병원 한 눈에 보기
   Widget NearbyHospital(){
     return Column(
       children: [
@@ -225,7 +227,7 @@ class _HomePageState extends State<HomePage> {
                 Icons.
                 settings,
                 color : Colors.black,
-                size : 30.0,
+                size : 25.0,
               ),
             ),
           ],
@@ -267,7 +269,7 @@ class _HomePageState extends State<HomePage> {
     return
       Row(
       children: [
-        Padding(padding: edgeInsets, child: Icon(Icons.location_on)),
+        Padding(padding: edgeInsets, child: Icon(Icons.location_on, size: 20)),
         Padding(padding: EdgeInsets.only(left: 10.0, top:10.0)),
         Container(
           width: 270.0, // 원하는 가로 길이 설정
@@ -281,9 +283,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
   //카드
-  Widget HospitalCard(String text, String address, String rating) {
-    return
-      Padding(
+  Widget HospitalCard(String text, String address, String rating, String hpId, int idx) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(hpid: hpId, hpidx: idx),
+          ),
+        );
+      },
+      child: Padding(
         padding: const EdgeInsets.only(top : 20.0),
         child: SizedBox(
           height: 265, width: double.infinity,
@@ -298,21 +308,21 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
+                  padding: EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0, bottom: 2.0),
                   child: Container(
                     width: double.infinity,
                     height: 150,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0), // 여기서 원하는 둥근 정도를 설정합니다.
+                      borderRadius: BorderRadius.circular(12.0),
                       child:  Image(
-                        image: AssetImage('assets/images/hospital1.png'),
+                        image: AssetImage('assets/images/hospital${idx}.png'),
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
+                  padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -325,7 +335,7 @@ class _HomePageState extends State<HomePage> {
                       Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(top:5.0),
+                            padding: const EdgeInsets.only(top: 5.0),
                             child: Icon(Icons.star_rounded, color: Colors.amberAccent),
                           ),
                           Text(rating),
@@ -339,8 +349,10 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-      );
+      ),
+    );
   }
+
   //우리 동네 인기병원
   Widget FamousHospital(){
     return

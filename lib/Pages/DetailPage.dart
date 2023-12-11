@@ -10,9 +10,10 @@ import "package:http/http.dart" as http;
 
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({required this.hpid, Key? key}) : super(key: key);
+  const DetailPage({required this.hpid, required this.hpidx, Key? key}) : super(key: key);
 
   final String hpid;
+  final int hpidx;
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -51,7 +52,8 @@ class _DetailPageState extends State<DetailPage> {
       children: [
         Padding(padding: edgeInsets, child: Icon(icon, size: 23,)),
         const Padding(padding: EdgeInsets.only(left: 10.0, top: 5.0)),
-        Text(text, style: detailTextStyle),
+        if(dropdownItems == null)
+          Expanded(child: Text(text, overflow: TextOverflow.ellipsis, maxLines:1, style: detailTextStyle)),
         if (dropdownItems != null)
           DropdownButton<String>(
             value: dropdownItems[0],
@@ -324,6 +326,11 @@ class _DetailPageState extends State<DetailPage> {
     pharmacyInfo();
   }
 
+  void _updateReviewInfo() {
+    reviewInfo();
+    hospitalDetailInfo();
+  }
+
   Future<void> hospitalDetailInfo() async {
     http.get(Uri.parse("https://socdoc.dev-lr.com/api/hospital/detail?hospitalId=${widget.hpid}&userId=${getUserID(context)}"))
       .then((value){
@@ -354,8 +361,8 @@ class _DetailPageState extends State<DetailPage> {
                 Container(
                   width: 400,
                   height: 200,
-                  child: const Image(
-                    image: AssetImage('assets/hospital3.png'),
+                  child: Image(
+                    image: AssetImage('assets/images/hospital${widget.hpidx}.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -435,7 +442,7 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                         floatingActionButton: FloatingActionButton(
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ReviewPage(hospitalID: hpId, hospitalName: hpName)));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ReviewPage(hospitalID: hpId, hospitalName: hpName, onReviewUpdate: _updateReviewInfo)));
                           },
                           backgroundColor: Colors.white,
                           child: const Icon(
