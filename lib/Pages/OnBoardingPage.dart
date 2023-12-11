@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:socdoc_flutter/Utils/Color.dart';
-import 'package:socdoc_flutter/Pages/LoginPage.dart';
 
 class OnBoardingPage extends StatefulWidget {
   const OnBoardingPage({super.key});
@@ -65,7 +64,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              SizedBox(width: 150.0), //text의 간격
+              SizedBox(width: 170.0), //text의 간격
               Expanded(
                 child: ValueListenableBuilder(
                   valueListenable: selectedIndex,
