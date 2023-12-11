@@ -22,9 +22,9 @@ class _HomePageState extends State<HomePage> {
   var FamousHospitalData;
   var UserLocationData;
   final edgeInsets = EdgeInsets.only(left: 16.0, top: 5.0);
-  final detailHospitalStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  final titleHospital = TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue);
-  final pagetitle = TextStyle(color: Colors.black, fontSize: 20.0, fontWeight: FontWeight.bold);
+  final detailHospitalStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.normal);
+  final titleHospital = TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColor.SocdocBlue);
+  final pagetitle = TextStyle(color: Colors.black, fontSize: 21.0, fontWeight: FontWeight.bold);
   String address1='';
   String address2='';
   Widget circularProgress(){
@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
               size : 35.0,
             ),
             SizedBox(width: 10.0),
-            Text('서울시 동작구',
+            Text(address1 + " " + address2,
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 21.0,
@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                     width: double.infinity,
                     height: 150,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0), // 여기서 원하는 둥근 정도를 설정합니다.
+                      borderRadius: BorderRadius.circular(12.0),
                       child:  Image(
                         image: AssetImage('assets/images/hospital1.png'),
                         fit: BoxFit.cover,
