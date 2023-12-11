@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:socdoc_flutter/Pages/DetailPage.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -84,11 +85,11 @@ class _HomePageState extends State<HomePage> {
                 String hospitalName = hospital["name"];
                 String hospitalAddress = hospital["address"];
                 String hospitalRating = hospital["rating"].toString();
+                String hospitalId = hospital["hpid"].toString();
 
-                print("1sdfds"+hospitalName);
                 print(hospitalAddress);
                 print(hospitalRating);
-                return HospitalCard(hospitalName, hospitalAddress,hospitalRating);
+                return HospitalCard(hospitalName, hospitalAddress,hospitalRating, hospitalId);
               },
             ),
         );
@@ -281,9 +282,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
   //카드
-  Widget HospitalCard(String text, String address, String rating) {
-    return
-      Padding(
+  Widget HospitalCard(String text, String address, String rating, String hpId) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(hpid: hpId),
+          ),
+        );
+      },
+      child: Padding(
         padding: const EdgeInsets.only(top : 20.0),
         child: SizedBox(
           height: 265, width: double.infinity,
@@ -298,7 +307,7 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(left: 12.0,right:12.0, top:12.0, bottom:2.0 ),
+                  padding: EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0, bottom: 2.0),
                   child: Container(
                     width: double.infinity,
                     height: 150,
@@ -312,7 +321,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20.0,right: 20.0,),
+                  padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -325,7 +334,7 @@ class _HomePageState extends State<HomePage> {
                       Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(top:5.0),
+                            padding: const EdgeInsets.only(top: 5.0),
                             child: Icon(Icons.star_rounded, color: Colors.amberAccent),
                           ),
                           Text(rating),
@@ -339,8 +348,10 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-      );
+      ),
+    );
   }
+
   //우리 동네 인기병원
   Widget FamousHospital(){
     return
