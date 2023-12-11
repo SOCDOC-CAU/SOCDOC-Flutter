@@ -310,7 +310,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                         name,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColor.logo),
+                        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: AppColor.logo),
                       ),
                     ),
                     Column(
