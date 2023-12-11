@@ -329,6 +329,12 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget FavoriteHospital(){
     if(isLoading_favoriteHospital) return circularProgress();
+    if(favoriteHospital.length == 0) return Container(
+      height: 100,
+      child: Center(
+        child: const Text("즐겨찾기 병원이 없습니다.", style: TextStyle(fontSize: 15.0, color: Colors.grey)),
+      ),
+    );
     return Container(
       height: 180,
       child: ListView.builder(
@@ -351,6 +357,12 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget MyReviewList(){
     if(isLoading_userReview) return circularProgress();
+    if(userReview.length == 0) return Container(
+      height: 100,
+      child: Center(
+        child: const Text("아직 리뷰가 없습니다.", style: TextStyle(fontSize: 15.0, color: Colors.grey)),
+      ),
+    );
     return Container(
       padding: const EdgeInsets.all(8.0),
       child: ListView.builder(
