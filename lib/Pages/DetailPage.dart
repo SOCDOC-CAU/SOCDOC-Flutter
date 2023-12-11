@@ -328,6 +328,7 @@ class _DetailPageState extends State<DetailPage> {
 
   void _updateReviewInfo() {
     reviewInfo();
+    hospitalDetailInfo();
   }
 
   Future<void> hospitalDetailInfo() async {
