@@ -148,6 +148,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   bool isHospitalSpecialtyPressed = false;
   bool isSelected =  false;
   String? selectedHospitalName;
+  int idx = 1;
 
   List<Widget> hospitalItemList = [];
 
@@ -256,7 +257,8 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
         var tmp = jsonDecode(utf8.decode(value.bodyBytes));
         setState(() {
           tmp["data"].forEach((item){
-            hospitalItemList.add(HospitalCard(item["name"], item["address"], item["hpid"], item["rating"]!.toString()));
+            hospitalItemList.add(HospitalCard(item["name"], item["address"], item["hpid"], item["rating"]!.toString(), idx));
+            idx++;
             mapMarkers.addLabelMarker(LabelMarker(
               label: item["name"],
               markerId: MarkerId(item["name"]),
@@ -269,10 +271,10 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
     });
   }
 
-  Widget HospitalCard(String name, String address, String hospitalID, String rating) {
+  Widget HospitalCard(String name, String address, String hospitalID, String rating, int idx) {
     return InkWell(
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(hpid: hospitalID)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(hpid: hospitalID, hpidx: idx)));
       },
       child: Column(
         children: [
@@ -295,8 +297,8 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                       height: 150,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12.0),
-                        child: const Image(
-                          image: AssetImage('assets/images/hospital1.png'),
+                        child: Image(
+                          image: AssetImage('assets/images/hospital${idx}.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
