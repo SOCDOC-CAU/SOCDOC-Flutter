@@ -508,7 +508,7 @@ class CustomDropDownState extends State<CustomDropDown> {
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(108, 45),
             padding: const EdgeInsets.only(left: 16, right: 6),
-            backgroundColor: AppColor.logo,
+            backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
               side: const BorderSide(
@@ -516,7 +516,7 @@ class CustomDropDownState extends State<CustomDropDown> {
                 width: 1.0,
               ),
             ),
-            foregroundColor: Colors.white,
+            foregroundColor: AppColor.logo,
             elevation: 0,
           ),
           child: Row(
@@ -529,7 +529,7 @@ class CustomDropDownState extends State<CustomDropDown> {
                 ),
               ),
               Icon(
-                isButtonPressed ? Icons.expand_more_rounded : Icons.expand_less_rounded,
+                isButtonPressed ? Icons.expand_less_rounded : Icons.expand_more_rounded,
                 size: 26,
               ),
             ],
