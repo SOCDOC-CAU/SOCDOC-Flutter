@@ -148,7 +148,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   bool isHospitalSpecialtyPressed = false;
   bool isSelected =  false;
   String? selectedHospitalName;
-  int idx = 1;
+  int idx = 100;
 
   List<Widget> hospitalItemList = [];
 
